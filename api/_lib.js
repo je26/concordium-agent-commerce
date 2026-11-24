@@ -184,6 +184,23 @@ async function getBuyerScheme() {
   return new ExactConcordiumScheme(signer);
 }
 
+// --- Transaction -> block height (via the testnet gRPC node) ------------------
+// Used after a trade settles so the audit entry carries the real block height
+// instead of null. Returns null when the node cannot answer (caller keeps the
+// trade and records null rather than failing a completed payment).
+async function getTxBlockHeight(txHash) {
+  const { ConcordiumGRPCNodeClient, credentials } = await import('@concordium/web-sdk/nodejs');
+  const { TransactionHash } = await import('@concordium/web-sdk');
+  const client = new ConcordiumGRPCNodeClient('grpc.testnet.concordium.com', 20000, credentials.createSsl());
+  const status = await client.getBlockItemStatus(TransactionHash.fromHexString(txHash));
+  const blockHash = status.status === 'finalized'
+    ? (status.outcome && status.outcome.blockHash)
+    : (status.outcomes && status.outcomes[0] ? status.outcomes[0].blockHash : null);
+  if (!blockHash) return null;
+  const info = await client.getBlockInfo(blockHash);
+  return info && info.blockHeight != null ? Number(info.blockHeight) : null;
+}
+
 function b64urlEncode(obj) {
   return Buffer.from(JSON.stringify(obj)).toString('base64url');
 }
@@ -198,5 +215,6 @@ module.exports = {
   checkBadgeByAccount, checkBadgeByToken,
   appendAudit, readAudit,
   getFacilitatorScheme, getBuyerScheme,
+  getTxBlockHeight,
   b64urlEncode, b64urlDecode,
 };

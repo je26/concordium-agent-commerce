@@ -1,6 +1,17 @@
 // Probe: can this Vercel runtime reach the Concordium testnet gRPC node?
 // GET /api/probe -> { grpcOk, nonce, consensus, mcpOk }
+// GET /api/probe?txHash=<64-hex> -> { txHash, blockHeight } (transaction lookup)
+const lib = require('./_lib');
+
 module.exports = async (req, res) => {
+  if (req.query && /^[0-9a-f]{64}$/i.test(req.query.txHash || '')) {
+    try {
+      const blockHeight = await lib.getTxBlockHeight(req.query.txHash);
+      return res.status(200).json({ txHash: req.query.txHash, blockHeight });
+    } catch (e) {
+      return res.status(502).json({ txHash: req.query.txHash, blockHeight: null, error: String(e.message || e) });
+    }
+  }
   const out = { grpcOk: false, nonce: null, consensus: null, mcpOk: false, error: null };
   try {
     const { ConcordiumGRPCNodeClient, credentials } = await import('@concordium/web-sdk/nodejs');

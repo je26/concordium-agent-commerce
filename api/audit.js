@@ -13,10 +13,40 @@ const TITLE_MAP = {
   'Belinyu Air Quality Readings (synthetic)': 'Air Quality Readings (synthetic)',
 };
 
+// Block heights for the trades that were recorded before the seller started
+// capturing them at settle time. Each height was read from CCDExplorer
+// (ccdexplorer.io/testnet/transaction/<hash>) on 2026-11-25. Stored entries
+// keep blockHeight: null; only the served value is filled in here.
+const BLOCK_HEIGHTS = {
+  '39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec': 51241702,
+  '7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3': 51241723,
+  '51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772': 51241876,
+  'b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47': 51242054,
+  'ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854': 51242654,
+};
+
+// Entries are stored as UTC ISO timestamps. The site shows them in WIB with
+// the zone named, so "01:12" always means 01:12 WIB, never the viewer's zone.
+const fmtWIB = new Intl.DateTimeFormat('en-GB', {
+  day: '2-digit', month: 'short', year: 'numeric',
+  hour: '2-digit', minute: '2-digit', hour12: false,
+  timeZone: 'Asia/Jakarta',
+});
+function displayTime(iso) {
+  try { return fmtWIB.format(new Date(iso)) + ' WIB'; } catch { return iso; }
+}
+
 module.exports = async (req, res) => {
   const entries = await lib.readAudit();
-  const mapped = entries.map((e) => (e && TITLE_MAP[e.datasetTitle]
-    ? { ...e, datasetTitle: TITLE_MAP[e.datasetTitle] }
-    : e));
+  const mapped = entries.map((e) => {
+    if (!e) return e;
+    const out = { ...e };
+    if (TITLE_MAP[out.datasetTitle]) out.datasetTitle = TITLE_MAP[out.datasetTitle];
+    if (out.blockHeight == null && BLOCK_HEIGHTS[out.txHash] != null) {
+      out.blockHeight = BLOCK_HEIGHTS[out.txHash];
+    }
+    out.timestampDisplay = displayTime(out.timestamp);
+    return out;
+  });
   res.status(200).json({ count: mapped.length, entries: mapped.slice().reverse() });
 };

@@ -15,11 +15,12 @@
   body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.55; }
   a { color: var(--teal); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
   nav { display: flex; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
   nav .brand { font-weight: 700; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 10px; }
   nav .brand img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
-  nav a { color: var(--muted); }
+  nav a { color: var(--muted); padding: 8px 4px; }
   nav a:hover { color: var(--text); text-decoration: none; }
   nav a.active { color: var(--teal); font-weight: 600; }
   header { padding: 32px 0 4px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
@@ -36,6 +37,8 @@
   .hint { color: var(--muted); font-size: 13.5px; margin-bottom: 14px; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 640px) {
+    nav { gap: 12px; font-size: 13px; }
+    nav .brand span { display: none; }
     .cards { grid-template-columns: 1fr; }
     /* Audit log as stacked cards on phones: every field stays visible. */
     #audit-box table, #audit-box thead, #audit-box tbody, #audit-box th, #audit-box td, #audit-box tr { display: block; }
@@ -79,20 +82,22 @@
   .empty { color: var(--muted); padding: 18px 0; font-size: 14px; }
   footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
   footer p { margin-bottom: 6px; }
-  footer .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  footer .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .copy-btn { background: transparent; border: 1px solid var(--line); color: var(--teal); font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+  .copy-btn:hover { border-color: var(--teal); }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav>
-    <a class="brand" href="/"><img src="/logo.png" alt="">Agent Commerce</a>
+    <a class="brand" href="/"><img src="/logo.png" alt=""><span>Agent Commerce</span></a>
     <a href="#agents">Agents</a>
     <a href="#buy">Buy</a>
     <a href="#audit">Audit log</a>
     <a href="/cards">Cards</a>
   </nav>
   <header>
-    <img src="/logo.png" alt="Concordium logo">
+    <img src="/logo.png" alt="Agent Commerce logo">
     <div>
       <h1>Agent Commerce on Concordium</h1>
       <div class="sub">Two AI agents trading data for CCD, over x402 — on Concordium testnet.</div>
@@ -114,6 +119,7 @@
         <div class="kv"><span class="k">Badge</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9XicC3TrEGEkFeSqtZ?network=testnet" target="_blank" rel="noopener">JyP9XicC3TrEGEkFeSqtZ</a></span></div>
         <div class="kv"><span class="k">Badge status</span><span class="v badge-wait" data-badge="buyer">Checking…</span></div>
         <div class="kv"><span class="k">Agent Card</span><span class="v"><a href="/cards/buyer-agent-card.json">buyer-agent-card.json</a></span></div>
+        <div class="kv"><span class="k">Card hash</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/verify-agent-card/JyP9XicC3TrEGEkFeSqtZ?network=testnet" target="_blank" rel="noopener">Verify card hash</a></span></div>
       </div>
       <div class="agent" id="seller-card">
         <div class="role">Seller agent</div>
@@ -123,6 +129,7 @@
         <div class="kv"><span class="k">Badge</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9XhWi7SMJS7WQfCw7V?network=testnet" target="_blank" rel="noopener">JyP9XhWi7SMJS7WQfCw7V</a></span></div>
         <div class="kv"><span class="k">Badge status</span><span class="v badge-wait" data-badge="seller">Checking…</span></div>
         <div class="kv"><span class="k">Agent Card</span><span class="v"><a href="/cards/seller-agent-card.json">seller-agent-card.json</a></span></div>
+        <div class="kv"><span class="k">Card hash</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/verify-agent-card/JyP9XhWi7SMJS7WQfCw7V?network=testnet" target="_blank" rel="noopener">Verify card hash</a></span></div>
       </div>
     </div>
   </section>
@@ -130,6 +137,7 @@
   <section id="buy">
     <h2>Buy a dataset</h2>
     <p class="hint">Runs the real buyer flow: 402 → seller badge check → signed V1 payment → facilitator settles → data released. The facilitator pays the fee, so the buyer pays only 1 CCD for the data.</p>
+    <p class="hint">x402 is the payment rule here: the seller answers 402 (payment required), the buyer signs a payment for exactly 1 CCD, and the facilitator submits it. “Exact” means the amount must be 1 CCD, no more and no less. “V1” is the signed payment format the facilitator accepts: the buyer signs, the facilitator pays the fee and sends the transaction.</p>
     <div class="trade">
       <div class="row">
         <select id="dataset">
@@ -153,7 +161,8 @@
   <footer>
     <p>Built for the Encode Club × Concordium hackathon — challenge “Make your Agents Accountable with Concordium”. Source: <a href="https://github.com/je26/concordium-agent-commerce">GitHub repo</a></p>
     <p>Honest note: this runs on the Concordium <strong>testnet</strong>. Testnet identities are issued without verification, so these badges are testnet-grade — they prove the registry and badge machinery works end to end, not a real-world identity check. All datasets are synthetic demo data.</p>
-    <p>Network: testnet <span class="mono">ccd:4221332d…b3fd0f27</span> · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt; · Facilitator: <span class="mono">3wsS…jCxE</span></p>
+    <p>Network: testnet <span class="mono">ccd:4221332d…b3fd0f27</span> · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt;</p>
+    <p>Facilitator: <span class="mono">3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE</span> <button class="copy-btn" id="copy-fac" type="button">Copy</button></p>
   </footer>
 </div>
 
@@ -166,12 +175,13 @@ async function loadBadges() {
     const el = document.querySelector(`[data-badge="${key}"]`);
     try {
       const r = await fetch(`/api/badge?badge=${badge}`);
+      if (!r.ok) throw new Error('badge check failed');
       const j = await r.json();
       const ok = j.badge_valid === true || (j.agents && j.agents.some(a => a.badge_valid));
       el.textContent = ok ? 'Verified' : 'Not verified';
       el.className = 'v ' + (ok ? 'badge-ok' : 'badge-bad');
     } catch (e) {
-      el.textContent = 'Check failed';
+      el.textContent = 'Check failed — registry unreachable, try again';
       el.className = 'v badge-bad';
     }
   }
@@ -186,8 +196,10 @@ async function loadAudit() {
       box.innerHTML = '<div class="empty">No trades yet. Buy a dataset above to create the first audit entry.</div>';
       return;
     }
+    const fmtWIB = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' });
+    const fmtTime = (e) => e.timestampDisplay || (fmtWIB.format(new Date(e.timestamp)) + ' WIB');
     const rows = j.entries.map(e => `<tr>
-      <td data-label="Time">${new Date(e.timestamp).toLocaleString('en-GB', { hour12: false })}</td>
+      <td data-label="Time">${fmtTime(e)}</td>
       <td data-label="Dataset">${e.datasetTitle || e.datasetId}</td>
       <td data-label="Amount">${e.amountCCD} CCD</td>
       <td data-label="Transaction"><span class="mono"><a href="${e.ccdexplorerUrl}" target="_blank" rel="noopener">${e.txHash.slice(0, 12)}…${e.txHash.slice(-8)}</a></span></td>
@@ -218,13 +230,17 @@ $('#buy-btn').addEventListener('click', async () => {
     done = Math.min(done + 1, seq.length - 1);
     setSteps(seq.map((t, i) => ({ text: t, cls: i < done ? 'done' : (i === done ? 'busy' : '') })));
   }, 5000);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 90000);
   try {
     const r = await fetch('/api/buy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ datasetId: $('#dataset').value }),
+      signal: ctrl.signal,
     });
     const j = await r.json();
+    clearTimeout(timer);
     clearInterval(tick);
     if (!r.ok || !j.ok) {
       setSteps(seq.map(t => ({ text: t, cls: '' })));
@@ -240,12 +256,25 @@ $('#buy-btn').addEventListener('click', async () => {
       loadAudit();
     }
   } catch (e) {
+    clearTimeout(timer);
     clearInterval(tick);
+    setSteps(seq.map(t => ({ text: t, cls: '' })));
     result.style.display = 'block';
-    result.innerHTML = `<span class="err">Trade failed: ${e.message}</span>`;
+    result.innerHTML = `<span class="err">Trade failed: ${e.name === 'AbortError' ? 'timed out after 90 seconds — no payment was sent. Try again.' : e.message}</span>`;
   } finally {
     btn.disabled = false;
   }
+});
+
+$('#copy-fac').addEventListener('click', async () => {
+  const btn = $('#copy-fac');
+  try {
+    await navigator.clipboard.writeText('3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE');
+    btn.textContent = 'Copied';
+  } catch (e) {
+    btn.textContent = 'Copy failed';
+  }
+  setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
 });
 
 loadBadges();

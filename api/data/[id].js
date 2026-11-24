@@ -67,6 +67,16 @@ module.exports = async (req, res) => {
   }
 
   const txHash = settle.transaction;
+  // The audit entry carries the real block height, looked up from the node
+  // after finalization. A lookup failure never fails the trade — the height
+  // stays null and can be filled in later from the explorer.
+  let blockHeight = null;
+  for (let attempt = 0; attempt < 3 && blockHeight == null; attempt++) {
+    try {
+      blockHeight = await lib.getTxBlockHeight(txHash);
+    } catch (e) { /* node unreachable — retry below */ }
+    if (blockHeight == null && attempt < 2) await new Promise((r) => setTimeout(r, 2000));
+  }
   const entry = {
     timestamp: new Date().toISOString(),
     buyerBadge: badgeChk.badges[0] || null,
@@ -78,7 +88,7 @@ module.exports = async (req, res) => {
     amountMicroCCD: lib.PRICE_MICROCCD,
     amountCCD: '1',
     txHash,
-    blockHeight: null,
+    blockHeight,
     badgeCheckVerdict: 'verified',
     ccdexplorerUrl: `https://ccdexplorer.io/testnet/transaction/${txHash}`,
     badgeCheckUrl: `https://agent-registry-mcp.concordium.com/v1/check-badge/${badgeChk.badges[0] || sender}?network=testnet`,
