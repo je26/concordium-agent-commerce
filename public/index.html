@@ -16,14 +16,22 @@
   a { color: var(--teal); text-decoration: none; }
   a:hover { text-decoration: underline; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
-  header { padding: 44px 0 8px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  nav { display: flex; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  nav .brand { font-weight: 700; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 10px; }
+  nav .brand img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
+  nav a { color: var(--muted); }
+  nav a:hover { color: var(--text); text-decoration: none; }
+  nav a.active { color: var(--teal); font-weight: 600; }
+  header { padding: 32px 0 4px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   header img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
   header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
   header .sub { color: var(--muted); font-size: 15px; margin-top: 2px; }
-  .pill { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--gold); background: rgba(212,175,55,.08); margin-left: auto; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--gold); background: rgba(212,175,55,.08); }
+  .pill-row { margin: 10px 0 0; }
   .lede { color: var(--muted); font-size: 16px; max-width: 720px; margin: 18px 0 30px; }
   .lede strong { color: var(--text); font-weight: 600; }
   section { margin-top: 36px; }
+  section:first-of-type { margin-top: 28px; }
   h2 { font-size: 18px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 4px; }
   .hint { color: var(--muted); font-size: 13.5px; margin-bottom: 14px; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -62,22 +70,30 @@
   .empty { color: var(--muted); padding: 18px 0; font-size: 14px; }
   footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
   footer p { margin-bottom: 6px; }
+  footer .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <nav>
+    <a class="brand" href="/"><img src="/logo.png" alt="">Agent Commerce</a>
+    <a href="#agents">Agents</a>
+    <a href="#buy">Buy</a>
+    <a href="#audit">Audit log</a>
+    <a href="/cards">Cards</a>
+  </nav>
   <header>
     <img src="/logo.png" alt="Concordium logo">
     <div>
       <h1>Agent Commerce on Concordium</h1>
       <div class="sub">Two AI agents trading data for CCD, over x402 — on Concordium testnet.</div>
     </div>
-    <span class="pill">Testnet demo</span>
   </header>
+  <div class="pill-row"><span class="pill">Testnet demo</span></div>
 
   <p class="lede">The <strong>buyer agent</strong> pays <strong>1 CCD per dataset</strong> to the <strong>seller agent</strong> using the x402 <em>exact</em> scheme. A self-hosted <strong>facilitator</strong> sponsors the transaction fee, so the buyer pays only for the data. Both agents are registered in the <strong>Concordium Agent Registry</strong> with Verified badges, and the seller checks the buyer's badge before releasing any data. Every trade is written to a public audit log with its on-chain transaction hash.</p>
 
-  <section>
+  <section id="agents">
     <h2>The agents</h2>
     <p class="hint">Badge status is checked live against the Concordium Agent Registry (testnet).</p>
     <div class="cards">
@@ -102,9 +118,9 @@
     </div>
   </section>
 
-  <section>
+  <section id="buy">
     <h2>Buy a dataset</h2>
-    <p class="hint">Runs the real buyer flow: 402 → seller badge check → signed V1 payment → facilitator settles → data released. The facilitator (3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE) pays the fee.</p>
+    <p class="hint">Runs the real buyer flow: 402 → seller badge check → signed V1 payment → facilitator settles → data released. The facilitator pays the fee, so the buyer pays only 1 CCD for the data.</p>
     <div class="trade">
       <div class="row">
         <select id="dataset">
@@ -119,16 +135,16 @@
     </div>
   </section>
 
-  <section>
+  <section id="audit">
     <h2>Audit log</h2>
     <p class="hint">Append-only. One entry per completed trade, with the on-chain transaction and the badge check behind it. <a href="/api/audit">View as JSON</a></p>
-    <div id="audit"><div class="empty">Loading…</div></div>
+    <div id="audit-box"><div class="empty">Loading…</div></div>
   </section>
 
   <footer>
-    <p>Built for the Encode Club × Concordium hackathon — challenge “Make your Agents Accountable with Concordium”. Source code will be published at <a href="https://github.com/je26/concordium-agent-commerce">github.com/je26/concordium-agent-commerce</a> (repository creation is pending — the deployment and all services here are already live).</p>
+    <p>Built for the Encode Club × Concordium hackathon — challenge “Make your Agents Accountable with Concordium”. Source: <a href="https://github.com/je26/concordium-agent-commerce">GitHub repo</a></p>
     <p>Honest note: this runs on the Concordium <strong>testnet</strong>. Testnet identities are issued without verification, so these badges are testnet-grade — they prove the registry and badge machinery works end to end, not a real-world identity check. All datasets are synthetic demo data.</p>
-    <p>Network: ccd:4221332d34e1694168c2a0c0b3fd0f27 (testnet) · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt; · Facilitator: 3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE</p>
+    <p>Network: testnet <span class="mono">ccd:4221332d…b3fd0f27</span> · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt; · Facilitator: <span class="mono">3wsS…jCxE</span></p>
   </footer>
 </div>
 
@@ -153,7 +169,7 @@ async function loadBadges() {
 }
 
 async function loadAudit() {
-  const box = $('#audit');
+  const box = $('#audit-box');
   try {
     const r = await fetch('/api/audit');
     const j = await r.json();
