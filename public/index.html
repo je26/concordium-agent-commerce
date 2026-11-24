@@ -17,11 +17,12 @@
   a:hover { text-decoration: underline; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
-  nav { display: flex; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 14px; position: sticky; top: 0; z-index: 10; background: var(--bg); }
+  nav { display: flex; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 14px; position: sticky; top: 0; z-index: 10; }
   section { scroll-margin-top: 80px; }
-  nav .brand { font-weight: 700; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 10px; }
+  nav .brand { font-weight: 700; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  nav .brand span { white-space: nowrap; }
   nav .brand img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
-  nav a { color: var(--muted); padding: 8px 4px; }
+  nav a { color: var(--muted); padding: 8px 4px; white-space: nowrap; flex-shrink: 0; }
   nav a:hover { color: var(--text); text-decoration: none; }
   nav a.active { color: var(--accent); font-weight: 600; }
   header { padding: 32px 0 4px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
@@ -39,6 +40,7 @@
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 640px) {
     nav { gap: 12px; font-size: 13px; }
+    nav .brand span { display: none; }
     .cards { grid-template-columns: 1fr; }
     /* Audit log as stacked cards on phones: every field stays visible. */
     #audit-box table, #audit-box thead, #audit-box tbody, #audit-box th, #audit-box td, #audit-box tr { display: block; }
