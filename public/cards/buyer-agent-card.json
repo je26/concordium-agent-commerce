@@ -1,0 +1,81 @@
+{
+  "name": "Belinyu Data Buyer",
+  "description": "An AI agent that buys synthetic Belinyu weather datasets over x402 on Concordium testnet, paying 1 CCD per dataset in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
+  "url": "https://concordium-agent-commerce.vercel.app/cards/buyer-agent-card.json",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "authentication": {
+    "schemes": []
+  },
+  "skills": [
+    {
+      "id": "buy-datasets",
+      "name": "Buy datasets",
+      "description": "Buys synthetic Belinyu weather datasets from the seller agent over x402, paying 1 CCD per dataset.",
+      "tags": [
+        "x402",
+        "datasets",
+        "weather"
+      ]
+    },
+    {
+      "id": "verify-seller-badge",
+      "name": "Verify seller badge",
+      "description": "Checks the seller agent Verified by Concordium badge via the Agent Registry MCP service before paying.",
+      "tags": [
+        "badge",
+        "verification"
+      ]
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://docs.concordium.com/a2a-extensions/concordium-badge/v1",
+        "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
+        "required": false,
+        "params": {
+          "tokenAddress": "ccd:4221332d34e1694168c2a0c0b3fd0f27/cis-2:JyP9XicC3TrEGEkFeSqtZ",
+          "owner": {
+            "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf"
+          },
+          "agentWallet": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf",
+          "contracts": {
+            "cis8004": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0",
+            "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
+          },
+          "services": {
+            "buyApi": "https://concordium-agent-commerce.vercel.app/api/buy"
+          },
+          "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
+          "verification": {
+            "service": "Concordium Agent Registry",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/JyP9XicC3TrEGEkFeSqtZ",
+            "mcp": "https://agent-registry-mcp.concordium.com/mcp",
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+          }
+        }
+      }
+    ]
+  },
+  "provider": {
+    "organization": "Sanjaya Purba",
+    "url": "https://www.sanjayapurba.com"
+  },
+  "documentationUrl": "https://github.com/je26/concordium-agent-commerce",
+  "registrations": [
+    {
+      "agentId": 1483,
+      "agentRegistry": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0"
+    }
+  ]
+}

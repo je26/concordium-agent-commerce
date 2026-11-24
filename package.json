@@ -1,0 +1,16 @@
+{
+  "name": "concordium-agent-commerce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@concordium/web-sdk": "^12.0.3",
+    "@x402/concordium": "^2.32.0"
+  }
+}

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Commerce on Concordium — Testnet Demo</title>
+<meta name="description" content="Two AI agents buy and sell data from each other on Concordium testnet, paying per dataset in CCD over x402. Both agents are registered in the Concordium Agent Registry with Verified badges, and every trade leaves an on-chain audit trail.">
+<style>
+  :root {
+    --bg: #0b1220; --surface: #111c33; --surface-2: #16233f; --line: #22304f;
+    --text: #e8edf7; --muted: #94a3b8; --teal: #2dd4bf; --teal-dim: #14b8a6;
+    --gold: #d4af37; --green: #34d399; --red: #f87171; --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.55; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
+  header { padding: 44px 0 8px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  header img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
+  header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  header .sub { color: var(--muted); font-size: 15px; margin-top: 2px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--gold); background: rgba(212,175,55,.08); margin-left: auto; }
+  .lede { color: var(--muted); font-size: 16px; max-width: 720px; margin: 18px 0 30px; }
+  .lede strong { color: var(--text); font-weight: 600; }
+  section { margin-top: 36px; }
+  h2 { font-size: 18px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .hint { color: var(--muted); font-size: 13.5px; margin-bottom: 14px; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+  .agent { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .agent .role { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+  .agent h3 { font-size: 19px; margin: 6px 0 2px; }
+  .agent .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--muted); word-break: break-all; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+  .kv:first-of-type { margin-top: 12px; }
+  .kv .k { color: var(--muted); }
+  .kv .v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; text-align: right; word-break: break-all; }
+  .badge-ok { color: var(--green); font-weight: 650; }
+  .badge-bad { color: var(--red); font-weight: 650; }
+  .badge-wait { color: var(--muted); }
+  .trade { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .trade .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
+  select, button { font: inherit; border-radius: 10px; }
+  select { flex: 1; min-width: 220px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); padding: 12px 14px; }
+  button { background: var(--teal-dim); color: #04211d; font-weight: 700; border: 0; padding: 12px 22px; cursor: pointer; }
+  button:hover { background: var(--teal); }
+  button:disabled { opacity: .55; cursor: wait; }
+  .steps { margin-top: 16px; font-size: 13.5px; color: var(--muted); display: none; }
+  .steps li { list-style: none; padding: 3px 0; }
+  .steps li.done { color: var(--text); }
+  .steps li.done::before { content: "✓ "; color: var(--green); }
+  .steps li.busy::before { content: "… "; color: var(--gold); }
+  .result { margin-top: 16px; display: none; border-top: 1px solid var(--line); padding-top: 16px; font-size: 14px; }
+  .result .tx { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; word-break: break-all; }
+  .result .err { color: var(--red); }
+  .data-preview { margin-top: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  td .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .empty { color: var(--muted); padding: 18px 0; font-size: 14px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
+  footer p { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="/logo.png" alt="Concordium logo">
+    <div>
+      <h1>Agent Commerce on Concordium</h1>
+      <div class="sub">Two AI agents trading data for CCD, over x402 — on Concordium testnet.</div>
+    </div>
+    <span class="pill">Testnet demo</span>
+  </header>
+
+  <p class="lede">The <strong>buyer agent</strong> pays <strong>1 CCD per dataset</strong> to the <strong>seller agent</strong> using the x402 <em>exact</em> scheme. A self-hosted <strong>facilitator</strong> sponsors the transaction fee, so the buyer pays only for the data. Both agents are registered in the <strong>Concordium Agent Registry</strong> with Verified badges, and the seller checks the buyer's badge before releasing any data. Every trade is written to a public audit log with its on-chain transaction hash.</p>
+
+  <section>
+    <h2>The agents</h2>
+    <p class="hint">Badge status is checked live against the Concordium Agent Registry (testnet).</p>
+    <div class="cards">
+      <div class="agent" id="buyer-card">
+        <div class="role">Buyer agent</div>
+        <h3>Belinyu Data Buyer</h3>
+        <div class="addr">3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf</div>
+        <div class="kv"><span class="k">Registry token</span><span class="v">1483</span></div>
+        <div class="kv"><span class="k">Badge</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9XicC3TrEGEkFeSqtZ?network=testnet" target="_blank" rel="noopener">JyP9XicC3TrEGEkFeSqtZ</a></span></div>
+        <div class="kv"><span class="k">Badge status</span><span class="v badge-wait" data-badge="buyer">Checking…</span></div>
+        <div class="kv"><span class="k">Agent Card</span><span class="v"><a href="/cards/buyer-agent-card.json">buyer-agent-card.json</a></span></div>
+      </div>
+      <div class="agent" id="seller-card">
+        <div class="role">Seller agent</div>
+        <h3>Belinyu Data Seller</h3>
+        <div class="addr">3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M</div>
+        <div class="kv"><span class="k">Registry token</span><span class="v">1482</span></div>
+        <div class="kv"><span class="k">Badge</span><span class="v"><a href="https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9XhWi7SMJS7WQfCw7V?network=testnet" target="_blank" rel="noopener">JyP9XhWi7SMJS7WQfCw7V</a></span></div>
+        <div class="kv"><span class="k">Badge status</span><span class="v badge-wait" data-badge="seller">Checking…</span></div>
+        <div class="kv"><span class="k">Agent Card</span><span class="v"><a href="/cards/seller-agent-card.json">seller-agent-card.json</a></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Buy a dataset</h2>
+    <p class="hint">Runs the real buyer flow: 402 → seller badge check → signed V1 payment → facilitator settles → data released. The facilitator (3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE) pays the fee.</p>
+    <div class="trade">
+      <div class="row">
+        <select id="dataset">
+          <option value="ds-belinyu-weather-24h">Belinyu 24h Weather Readings (synthetic) — 1 CCD</option>
+          <option value="ds-belinyu-tide">Belinyu Tide Table (synthetic) — 1 CCD</option>
+          <option value="ds-belinyu-air">Belinyu Air Quality Readings (synthetic) — 1 CCD</option>
+        </select>
+        <button id="buy-btn">Buy dataset — 1 CCD</button>
+      </div>
+      <ul class="steps" id="steps"></ul>
+      <div class="result" id="result"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Audit log</h2>
+    <p class="hint">Append-only. One entry per completed trade, with the on-chain transaction and the badge check behind it. <a href="/api/audit">View as JSON</a></p>
+    <div id="audit"><div class="empty">Loading…</div></div>
+  </section>
+
+  <footer>
+    <p>Built for the Encode Club × Concordium hackathon — challenge “Make your Agents Accountable with Concordium”. Source code will be published at <a href="https://github.com/je26/concordium-agent-commerce">github.com/je26/concordium-agent-commerce</a> (repository creation is pending — the deployment and all services here are already live).</p>
+    <p>Honest note: this runs on the Concordium <strong>testnet</strong>. Testnet identities are issued without verification, so these badges are testnet-grade — they prove the registry and badge machinery works end to end, not a real-world identity check. All datasets are synthetic demo data.</p>
+    <p>Network: ccd:4221332d34e1694168c2a0c0b3fd0f27 (testnet) · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt; · Facilitator: 3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE</p>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+async function loadBadges() {
+  const map = { buyer: 'JyP9XicC3TrEGEkFeSqtZ', seller: 'JyP9XhWi7SMJS7WQfCw7V' };
+  for (const [key, badge] of Object.entries(map)) {
+    const el = document.querySelector(`[data-badge="${key}"]`);
+    try {
+      const r = await fetch(`/api/badge?badge=${badge}`);
+      const j = await r.json();
+      const ok = j.badge_valid === true || (j.agents && j.agents.some(a => a.badge_valid));
+      el.textContent = ok ? 'Verified' : 'Not verified';
+      el.className = 'v ' + (ok ? 'badge-ok' : 'badge-bad');
+    } catch (e) {
+      el.textContent = 'Check failed';
+      el.className = 'v badge-bad';
+    }
+  }
+}
+
+async function loadAudit() {
+  const box = $('#audit');
+  try {
+    const r = await fetch('/api/audit');
+    const j = await r.json();
+    if (!j.entries || j.entries.length === 0) {
+      box.innerHTML = '<div class="empty">No trades yet. Buy a dataset above to create the first audit entry.</div>';
+      return;
+    }
+    const rows = j.entries.map(e => `<tr>
+      <td>${new Date(e.timestamp).toLocaleString('en-GB', { hour12: false })}</td>
+      <td>${e.datasetTitle || e.datasetId}</td>
+      <td>${e.amountCCD} CCD</td>
+      <td><span class="mono"><a href="${e.ccdexplorerUrl}" target="_blank" rel="noopener">${e.txHash.slice(0, 12)}…${e.txHash.slice(-8)}</a></span></td>
+      <td>${e.badgeCheckVerdict}</td>
+    </tr>`).join('');
+    box.innerHTML = `<table><thead><tr><th>Time</th><th>Dataset</th><th>Amount</th><th>Transaction</th><th>Badge</th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch (e) {
+    box.innerHTML = '<div class="empty">Could not load the audit log.</div>';
+  }
+}
+
+$('#buy-btn').addEventListener('click', async () => {
+  const btn = $('#buy-btn'), steps = $('#steps'), result = $('#result');
+  btn.disabled = true;
+  result.style.display = 'none';
+  steps.style.display = 'block';
+  const setSteps = (list) => { steps.innerHTML = list.map(s => `<li class="${s.cls}">${s.text}</li>`).join(''); };
+  const seq = [
+    'Requesting dataset — expecting HTTP 402',
+    'Checking the seller\u2019s badge before paying',
+    'Building and signing the V1 sponsored payment (1 CCD)',
+    'Facilitator verifies, sponsors the fee and settles on-chain',
+    'Seller releases the dataset',
+  ];
+  setSteps(seq.map((t, i) => ({ text: t, cls: i === 0 ? 'busy' : '' })));
+  let done = 0;
+  const tick = setInterval(() => {
+    done = Math.min(done + 1, seq.length - 1);
+    setSteps(seq.map((t, i) => ({ text: t, cls: i < done ? 'done' : (i === done ? 'busy' : '') })));
+  }, 5000);
+  try {
+    const r = await fetch('/api/buy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ datasetId: $('#dataset').value }),
+    });
+    const j = await r.json();
+    clearInterval(tick);
+    if (!r.ok || !j.ok) {
+      setSteps(seq.map(t => ({ text: t, cls: '' })));
+      result.style.display = 'block';
+      result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span><br><span class="tx">${JSON.stringify(j.detail || j.steps || {}, null, 2).slice(0, 600)}</span>`;
+    } else {
+      setSteps(seq.map(t => ({ text: t, cls: 'done' })));
+      result.style.display = 'block';
+      result.innerHTML = `<strong>Trade complete.</strong> 1 CCD paid to the seller.<br>
+        Transaction: <span class="tx"><a href="${j.payment.explorerUrl}" target="_blank" rel="noopener">${j.payment.txHash}</a></span><br>
+        Buyer badge: ${j.audit.buyerBadge} · Seller badge: ${j.audit.sellerBadge}<br>
+        <div class="data-preview">${JSON.stringify(j.dataset, null, 2).slice(0, 2000)}</div>`;
+      loadAudit();
+    }
+  } catch (e) {
+    clearInterval(tick);
+    result.style.display = 'block';
+    result.innerHTML = `<span class="err">Trade failed: ${e.message}</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+loadBadges();
+loadAudit();
+setInterval(loadAudit, 30000);
+</script>
+</body>
+</html>
