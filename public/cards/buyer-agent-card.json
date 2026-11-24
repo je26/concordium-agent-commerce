@@ -1,6 +1,6 @@
 {
-  "name": "Belinyu Data Buyer",
-  "description": "An AI agent that buys synthetic Belinyu weather datasets over x402 on Concordium testnet, paying 1 CCD per dataset in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
+  "name": "Web3 Data Buyer",
+  "description": "An AI agent that buys synthetic weather datasets over x402 on Concordium testnet, paying 1 CCD per dataset in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
   "url": "https://concordium-agent-commerce.vercel.app/cards/buyer-agent-card.json",
   "version": "1.0.0",
   "defaultInputModes": [
@@ -18,7 +18,7 @@
     {
       "id": "buy-datasets",
       "name": "Buy datasets",
-      "description": "Buys synthetic Belinyu weather datasets from the seller agent over x402, paying 1 CCD per dataset.",
+      "description": "Buys synthetic weather datasets from the seller agent over x402, paying 1 CCD per dataset.",
       "tags": [
         "x402",
         "datasets",

@@ -20,17 +20,24 @@ function mulberry32(seed) {
   };
 }
 
-function weatherRows() {
+function onchainRows() {
   const rnd = mulberry32(20261124);
+  const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  const addr = () => {
+    let s = '3';
+    for (let i = 0; i < 11; i++) s += B58[Math.floor(rnd() * B58.length)];
+    return s;
+  };
+  const types = ['transfer', 'contract call', 'token mint'];
   const rows = [];
+  const base = Date.UTC(2026, 10, 25, 0, 0, 0);
   for (let h = 0; h < 24; h++) {
-    const temp = +(26 + Math.sin((h - 6) / 24 * Math.PI * 2) * 3 + rnd() * 0.8).toFixed(1);
     rows.push({
-      hour: String(h).padStart(2, '0') + ':00',
-      temperature_c: temp,
-      humidity_pct: Math.round(72 + Math.cos(h / 24 * Math.PI * 2) * 10 + rnd() * 4),
-      wind_kmh: Math.round(8 + rnd() * 14),
-      condition: temp > 28 ? 'sunny' : (h % 5 === 0 ? 'light rain' : 'partly cloudy'),
+      timestamp: new Date(base + h * 3600 * 1000).toISOString(),
+      sender: addr(),
+      receiver: addr(),
+      amount_ccd: +(0.1 + rnd() * 49.9).toFixed(2),
+      type: types[h % 3],
     });
   }
   return rows;
@@ -64,22 +71,22 @@ function airRows() {
 }
 
 const DATASETS = {
-  'ds-belinyu-weather-24h': {
-    id: 'ds-belinyu-weather-24h',
-    title: 'Belinyu 24h Weather Readings (synthetic)',
-    description: 'Hourly synthetic temperature, humidity, wind and conditions for Belinyu, Bangka. Clearly fake demo data.',
-    rows: weatherRows(),
+  'ds-onchain-activity-24h': {
+    id: 'ds-onchain-activity-24h',
+    title: '24h On-Chain Activity (synthetic)',
+    description: 'Synthetic Concordium testnet transaction records — sender, receiver, amount and type. Clearly fake demo data.',
+    rows: onchainRows(),
   },
   'ds-belinyu-tide': {
     id: 'ds-belinyu-tide',
-    title: 'Belinyu Tide Table (synthetic)',
-    description: 'Synthetic high/low tide times and heights for Belinyu. Clearly fake demo data.',
+    title: 'Tide Table (synthetic)',
+    description: 'Synthetic high/low tide times and heights. Clearly fake demo data.',
     rows: tideRows(),
   },
   'ds-belinyu-air': {
     id: 'ds-belinyu-air',
-    title: 'Belinyu Air Quality Readings (synthetic)',
-    description: 'Synthetic PM2.5 / PM10 readings for Belinyu. Clearly fake demo data.',
+    title: 'Air Quality Readings (synthetic)',
+    description: 'Synthetic PM2.5 / PM10 readings. Clearly fake demo data.',
     rows: airRows(),
   },
 };

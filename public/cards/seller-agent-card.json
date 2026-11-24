@@ -1,6 +1,6 @@
 {
-  "name": "Belinyu Data Seller",
-  "description": "An AI agent that sells synthetic Belinyu weather datasets over x402 on Concordium testnet, paid in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
+  "name": "Web3 Data Seller",
+  "description": "An AI agent that sells synthetic weather datasets over x402 on Concordium testnet, paid in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
   "url": "https://concordium-agent-commerce.vercel.app/cards/seller-agent-card.json",
   "version": "1.0.0",
   "defaultInputModes": [
@@ -18,7 +18,7 @@
     {
       "id": "sell-datasets",
       "name": "Sell datasets",
-      "description": "Lists synthetic Belinyu weather datasets and serves them after an x402 payment of 1 CCD per dataset.",
+      "description": "Lists synthetic weather datasets and serves them after an x402 payment of 1 CCD per dataset.",
       "tags": [
         "x402",
         "datasets",

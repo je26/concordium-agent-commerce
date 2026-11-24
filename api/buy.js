@@ -8,7 +8,7 @@ const lib = require('./_lib');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  const datasetId = (req.body && req.body.datasetId) || 'ds-belinyu-weather-24h';
+  const datasetId = (req.body && req.body.datasetId) || 'ds-onchain-activity-24h';
   if (!lib.DATASETS[datasetId]) return res.status(400).json({ error: 'unknown dataset', datasetId });
 
   const steps = [];

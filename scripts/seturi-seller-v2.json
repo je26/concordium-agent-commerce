@@ -1,0 +1,9 @@
+{
+  "role": "seller",
+  "receiveName": "CIS-8004.setAgentURI",
+  "parameterHex": "08ca050000000000000001133ba84f11845485de3ac7064ec9cb33c1faf3c4c2e4bb1ad1841f2c24c24e0d",
+  "nonce": "3",
+  "txHash": "98e0993c162d3ad01b766c8f18beda9b42c20f4136c55ccacbf780d5d53ff7bd",
+  "submittedAt": "2026-11-24T18:08:29.360Z",
+  "explorerUrl": "https://ccdexplorer.io/testnet/transaction/98e0993c162d3ad01b766c8f18beda9b42c20f4136c55ccacbf780d5d53ff7bd"
+}

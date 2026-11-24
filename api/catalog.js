@@ -11,5 +11,5 @@ module.exports = (req, res) => {
     network: NETWORK,
     rows: d.rows.length,
   }));
-  res.status(200).json({ seller: 'Belinyu Data Seller', network: NETWORK, datasets });
+  res.status(200).json({ seller: 'Web3 Data Seller', network: NETWORK, datasets });
 };
