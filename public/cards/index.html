@@ -4,25 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Cards — Agent Commerce on Concordium</title>
-<meta name="description" content="The two registered AI agents behind Agent Commerce on Concordium: their Agent Cards, registry tokens and Verified badges.">
+<meta name="description" content="The two registered AI agents: their Agent Cards, registry tokens and Verified badges.">
 <style>
   :root {
-    --bg: #0b1220; --surface: #111c33; --surface-2: #16233f; --line: #22304f;
-    --text: #e8edf7; --muted: #94a3b8; --teal: #2dd4bf; --teal-dim: #14b8a6;
-    --gold: #d4af37; --green: #34d399; --red: #f87171; --radius: 14px;
+    --bg: #faf7f1; --surface: #ffffff; --surface-2: #f2ecdf; --line: #e2d9c6;
+    --text: #211c14; --muted: #6f675a; --accent: #8a5a12; --accent-soft: #a06c1a;
+    --gold: #8a6d1b; --ok: #8a5a12; --red: #b91c1c; --radius: 14px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.55; }
-  a { color: var(--teal); text-decoration: none; }
+  a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
   nav { display: flex; align-items: center; gap: 22px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 14px; position: sticky; top: 0; z-index: 10; background: var(--bg); }
   nav .brand { font-weight: 700; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 10px; }
   nav .brand img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
   nav a { color: var(--muted); padding: 8px 4px; }
   nav a:hover { color: var(--text); text-decoration: none; }
-  nav a.active { color: var(--teal); font-weight: 600; }
+  nav a.active { color: var(--accent); font-weight: 600; }
   header { padding: 32px 0 4px; }
   header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
   header .sub { color: var(--muted); font-size: 15px; margin-top: 2px; }
@@ -31,19 +31,19 @@
   .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
   @media (max-width: 640px) { nav { gap: 12px; font-size: 13px; } nav .brand span { display: none; } .cards { grid-template-columns: 1fr; } .cards-3 { grid-template-columns: 1fr; } }
   .agent { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-  .agent .role { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+  .agent .role { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
   .agent h3 { font-size: 19px; margin: 6px 0 2px; }
   .agent .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; color: var(--muted); word-break: break-all; }
   .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
   .kv:first-of-type { margin-top: 12px; }
   .kv .k { color: var(--muted); }
   .kv .v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; text-align: right; word-break: break-all; }
-  .badge-ok { color: var(--green); font-weight: 650; }
+  .badge-ok { color: var(--ok); font-weight: 650; }
   .badge-bad { color: var(--red); font-weight: 650; }
   .badge-wait { color: var(--muted); }
   .agent .links { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
   .agent .links a { font-size: 13px; font-weight: 600; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
-  .agent .links a:hover { border-color: var(--teal); text-decoration: none; }
+  .agent .links a:hover { border-color: var(--accent); text-decoration: none; }
   footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 18px; }
   footer p { margin-bottom: 6px; }
 </style>
@@ -59,7 +59,7 @@
   </nav>
   <header>
     <h1>Agent Cards</h1>
-    <div class="sub">Both agents, registered in the Concordium Agent Registry (testnet) with Verified badges.</div>
+    <div class="sub">Both agents, registered with Verified badges (testnet).</div>
   </header>
 
   <section>
@@ -95,15 +95,15 @@
     <h2 style="font-size:18px;font-weight:650;letter-spacing:-0.01em;margin-bottom:4px;">How verification works</h2>
     <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px;">Anyone can check either agent without trusting this site.</p>
     <div class="cards cards-3">
-      <div class="agent"><div class="role">Step 1</div><h3 style="font-size:16px;">Fetch the card</h3><p style="color:var(--muted);font-size:13.5px;">Open the Agent Card JSON above. It is the agent's public description, served from this site.</p></div>
-      <div class="agent"><div class="role">Step 2</div><h3 style="font-size:16px;">Hash it</h3><p style="color:var(--muted);font-size:13.5px;">Take the SHA-256 of the exact card bytes. The registry stores this hash on-chain at registration.</p></div>
+      <div class="agent"><div class="role">Step 1</div><h3 style="font-size:16px;">Fetch the card</h3><p style="color:var(--muted);font-size:13.5px;">Open the Agent Card JSON above — the agent's public description, served from this site.</p></div>
+      <div class="agent"><div class="role">Step 2</div><h3 style="font-size:16px;">Hash it</h3><p style="color:var(--muted);font-size:13.5px;">SHA-256 the exact card bytes. The registry stores this hash on-chain.</p></div>
       <div class="agent"><div class="role">Step 3</div><h3 style="font-size:16px;">Compare on-chain</h3><p style="color:var(--muted);font-size:13.5px;">Use “Verify card hash” to compare your hash with the on-chain <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;">metadata_hash</span>. A match means the card is the registered one.</p></div>
     </div>
   </section>
 
   <footer>
-    <p>Built for the Encode Club × Concordium hackathon — challenge “Make your Agents Accountable with Concordium”. Source: <a href="https://github.com/je26/concordium-agent-commerce">GitHub repo</a></p>
-    <p>Honest note: this runs on the Concordium <strong>testnet</strong>. Testnet identities are issued without verification, so these badges are testnet-grade — they prove the registry and badge machinery works end to end, not a real-world identity check.</p>
+    <p>Encode Club × Concordium hackathon — “Make your Agents Accountable with Concordium”. Source: <a href="https://github.com/je26/concordium-agent-commerce">GitHub repo</a></p>
+    <p>Testnet demo. Testnet identities are unverified, so these badges prove the machinery works — not a real-world identity check.</p>
   </footer>
 </div>
 
