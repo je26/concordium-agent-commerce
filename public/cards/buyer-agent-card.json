@@ -1,7 +1,7 @@
 {
   "name": "Web3 Data Buyer",
-  "description": "An AI agent that buys synthetic weather datasets over x402 on Concordium testnet, paying 1 CCD per dataset in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
-  "url": "https://concordium-agent-commerce.vercel.app/cards/buyer-agent-card.json",
+  "description": "An AI agent that buys synthetic datasets over x402 on Concordium testnet — on-chain activity records, tide tables and air quality readings — paying 1 CCD per dataset in native test CCD. Registered in the CIS-8004 Agent Registry. Testnet registration: the badge is anchored to an unverified testnet identity.",
+  "url": "https://concordium-agent-commerce.vercel.app/api/buy",
   "version": "1.0.0",
   "defaultInputModes": [
     "text/markdown",
@@ -18,11 +18,11 @@
     {
       "id": "buy-datasets",
       "name": "Buy datasets",
-      "description": "Buys synthetic weather datasets from the seller agent over x402, paying 1 CCD per dataset.",
+      "description": "Buys synthetic datasets from the seller agent over x402 — on-chain activity records, tide tables and air quality readings — paying 1 CCD per dataset.",
       "tags": [
         "x402",
         "datasets",
-        "weather"
+        "on-chain"
       ]
     },
     {
@@ -59,9 +59,10 @@
           "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
           "verification": {
             "service": "Concordium Agent Registry",
-            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/JyP9XicC3TrEGEkFeSqtZ",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9XicC3TrEGEkFeSqtZ?network=testnet",
             "mcp": "https://agent-registry-mcp.concordium.com/mcp",
-            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html",
+            "docsNote": "These docs describe the mainnet registry. This demo runs on testnet, where the same contracts are deployed at CIS-8004 <12802,0> and CIS-8 <12801,0>."
           }
         }
       }
