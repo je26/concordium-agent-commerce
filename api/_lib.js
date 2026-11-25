@@ -142,14 +142,20 @@ function baseUrl(req) {
 }
 
 // --- Trigger info for the audit log ----------------------------------------
-// Records WHO/WHAT triggered a buy without storing a raw IP: the client IP
-// is SHA-256 hashed (first 16 hex chars) and the user agent is stored as a
-// (truncated) string. Never store the raw IP in the audit log.
+// Records WHO/WHAT triggered a buy without storing a raw IP or a reversible
+// hash: the client IP is HMAC-SHA256 keyed by the server secret
+// (CCD_TRIGGER_HMAC_SECRET, Vercel env var, encrypted). Without the secret
+// the hash cannot be reversed to an IP, and rotating the secret invalidates
+// old hashes. Falls back to plain SHA-256 only when no secret is configured
+// (local dev). The user agent is stored as a (truncated) string.
 const crypto = require('crypto');
 function triggerInfo(req) {
   const ip = ((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim()
     || (req.headers && req.headers['x-real-ip']) || 'unknown';
-  const ipHash = crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
+  const secret = process.env.CCD_TRIGGER_HMAC_SECRET || '';
+  const ipHash = secret
+    ? crypto.createHmac('sha256', secret).update(ip).digest('hex').slice(0, 16)
+    : crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
   const ua = (req.headers && req.headers['user-agent']) || 'unknown';
   return { ipHash, userAgent: String(ua).slice(0, 200) };
 }
@@ -157,11 +163,11 @@ function triggerInfo(req) {
 // --- Per-IP rate limit for /api/buy (H2) -------------------------------------
 // The demo Buy button must stay public (judges click it), so the endpoint has
 // no auth — but an uncapped public spend is a drain vector. Cap it per IP via
-// KV: 20 buys per hour. Generous for a human judge, far too slow to drain the
-// testnet wallets (20,000 CCD would need 1,000 IPs or 1,000 hours from one IP).
+// KV: 4 buys per hour (lowered from 20 — 4 is plenty for a human judge
+// testing the flow, and far too slow to drain the testnet wallets).
 // Fails OPEN when KV is unavailable so a KV outage never bricks the demo;
 // the settle-side pinning (H1) still blocks arbitrary payments.
-async function rateLimitBuy(req, limit = 20, windowSeconds = 3600) {
+async function rateLimitBuy(req, limit = 4, windowSeconds = 3600) {
   const { url, token } = kv();
   if (!url || !token) return { allowed: true, reason: 'kv not configured (fail open)' };
   const ip = ((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim()
@@ -261,8 +267,33 @@ async function kvLrange(key, start, stop) {
   return j.result || [];
 }
 
+async function kvSet(key, value) {
+  const { url, token } = kv();
+  if (!url || !token) return { ok: false, error: 'kv not configured' };
+  const r = await fetch(`${url}/set/${encodeURIComponent(key)}/${encodeURIComponent(value)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return { ok: r.ok, status: r.status };
+}
+
 async function appendAudit(entry) {
   return kvRpush('ccd-audit:trades', JSON.stringify(entry));
+}
+
+// --- Private trigger records (NOT public) -----------------------------------
+// The trigger (HMAC'd IP hash + user agent) for a trade is stored under a
+// separate private KV key, keyed by tx hash. It is NEVER part of the public
+// audit entry and NEVER served by /api/audit. The owner can look it up
+// directly in KV when investigating a trade; there is no public endpoint
+// for it.
+async function storeTriggerRecord(txHash, trigger) {
+  if (!txHash || !trigger) return { ok: false, error: 'missing txHash or trigger' };
+  return kvSet(`ccd-audit:trigger:${txHash}`, JSON.stringify({
+    txHash,
+    ipHash: trigger.ipHash || null,
+    userAgent: trigger.userAgent || null,
+    recordedAt: new Date().toISOString(),
+  }));
 }
 
 async function readAudit() {
@@ -325,7 +356,7 @@ module.exports = {
   NETWORK, PRICE_MICROCCD, SELLER_BADGE, BUYER_BADGE, SELLER_TOKEN_ID, BUYER_TOKEN_ID,
   MCP_BASE, SITE_URL, DATASETS, paymentRequirements,
   validateFacilitatorRequirements, baseUrl, rateLimitBuy, rateLimitBuyGlobal,
-  triggerInfo,
+  triggerInfo, storeTriggerRecord,
   checkBadgeByAccount, checkBadgeByToken,
   appendAudit, readAudit,
   getFacilitatorScheme, getBuyerScheme,

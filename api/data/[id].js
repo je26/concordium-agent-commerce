@@ -80,7 +80,8 @@ module.exports = async (req, res) => {
   // Trigger record: who/what initiated this buy. The Buy button path
   // (/api/buy) forwards the original caller's IP hash + user agent; a direct
   // x402 call to this endpoint has no forwarded headers, so the trigger is
-  // computed from this request itself. The raw IP is never stored.
+  // computed from this request itself. The raw IP is never stored, and the
+  // IP hash is HMAC'd with the server secret (see lib.triggerInfo).
   const fwdIpHash = req.headers['x-trigger-ip-hash'];
   const fwdUa = req.headers['x-trigger-user-agent'];
   const trigger = (fwdIpHash || fwdUa)
@@ -98,8 +99,6 @@ module.exports = async (req, res) => {
     amountCCD: '1',
     txHash,
     blockHeight,
-    triggerIpHash: trigger.ipHash,
-    triggerUserAgent: trigger.userAgent,
     badgeCheckVerdict: 'verified',
     ccdexplorerUrl: `https://ccdexplorer.io/testnet/transaction/${txHash}`,
     badgeCheckUrl: `https://agent-registry-mcp.concordium.com/v1/check-badge/${badgeChk.badges[0] || sender}?network=testnet`,
@@ -111,6 +110,11 @@ module.exports = async (req, res) => {
   const auditResult = await lib.appendAudit(entry);
   const auditRecorded = !!(auditResult && auditResult.ok);
   if (!auditRecorded) console.error('audit append failed', auditResult);
+  // The trigger record goes to a SEPARATE private KV key, never into the
+  // public audit entry. A failure here never fails the trade; it only means
+  // this trade has no trigger record to look up later.
+  const triggerResult = await lib.storeTriggerRecord(txHash, trigger);
+  if (!triggerResult.ok) console.error('trigger record store failed', triggerResult);
 
   return res.status(200).json({
     dataset: ds,

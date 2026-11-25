@@ -248,7 +248,8 @@ $('#buy-btn').addEventListener('click', async () => {
     if (!r.ok || !j.ok) {
       if (!renderServerSteps(j.steps)) setSteps(seq.map(t => ({ text: t, cls: '' })));
       result.style.display = 'block';
-      result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span><br><span class="tx">${JSON.stringify(j.detail || {}, null, 2).slice(0, 600)}</span>`;
+      const auditLink = j.auditLogUrl ? `<br><a href="${j.auditLogUrl}">See today's trades in the public audit log</a>` : '';
+      result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span>${auditLink}<br><span class="tx">${JSON.stringify(j.detail || {}, null, 2).slice(0, 600)}</span>`;
     } else {
       if (!renderServerSteps(j.steps)) setSteps(seq.map(t => ({ text: t, cls: 'done' })));
       result.style.display = 'block';

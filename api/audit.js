@@ -68,6 +68,11 @@ module.exports = async (req, res) => {
     // replaced by a different one (ds-onchain-activity-24h) — displayTitle
     // shows what was actually bought for those entries.
     out.displayTitle = DISPLAY_TITLE_MAP[out.datasetTitle] || out.datasetTitle;
+    // Trigger data (IP hash, user agent) lives in a separate private KV key
+    // and is NEVER served here. Strip it defensively in case any stored
+    // entry ever carries it.
+    delete out.triggerIpHash;
+    delete out.triggerUserAgent;
     if (out.blockHeight == null && BLOCK_HEIGHTS[out.txHash] != null) {
       out.blockHeight = BLOCK_HEIGHTS[out.txHash];
     }
