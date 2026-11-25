@@ -167,12 +167,14 @@ function triggerInfo(req) {
 // testing the flow, and far too slow to drain the testnet wallets).
 // Fails OPEN when KV is unavailable so a KV outage never bricks the demo;
 // the settle-side pinning (H1) still blocks arbitrary payments.
-async function rateLimitBuy(req, limit = 4, windowSeconds = 3600) {
+// keyPrefix is 'ccd-ratelimit:' in production; tests pass 'ccd-test:' so
+// they never touch production counters.
+async function rateLimitBuy(req, limit = 4, windowSeconds = 3600, keyPrefix = 'ccd-ratelimit:') {
   const { url, token } = kv();
   if (!url || !token) return { allowed: true, reason: 'kv not configured (fail open)' };
   const ip = ((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim()
     || (req.headers && req.headers['x-real-ip']) || 'unknown';
-  const key = `ccd-ratelimit:buy:${ip}`;
+  const key = `${keyPrefix}buy:${ip}`;
   try {
     const r = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -198,11 +200,12 @@ async function rateLimitBuy(req, limit = 4, windowSeconds = 3600) {
 // per UTC day and expires after 48h. At 1 CCD + ~5 CCD facilitator fee per
 // buy, 50/day bounds the worst case to 50 CCD buyer + ~250 CCD facilitator
 // per day. Fails OPEN when KV is unavailable (same reasoning as per-IP).
-async function rateLimitBuyGlobal(req, limit = 50) {
+// keyPrefix is 'ccd-ratelimit:' in production; tests pass 'ccd-test:'.
+async function rateLimitBuyGlobal(req, limit = 50, keyPrefix = 'ccd-ratelimit:') {
   const { url, token } = kv();
   if (!url || !token) return { allowed: true, reason: 'kv not configured (fail open)' };
   const day = new Date().toISOString().slice(0, 10); // UTC YYYY-MM-DD
-  const key = `ccd-ratelimit:buy:global:${day}`;
+  const key = `${keyPrefix}buy:global:${day}`;
   try {
     const r = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {
       headers: { Authorization: `Bearer ${token}` },
