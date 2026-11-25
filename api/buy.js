@@ -11,8 +11,16 @@ module.exports = async (req, res) => {
   const datasetId = (req.body && req.body.datasetId) || 'ds-onchain-activity-24h';
   if (!lib.DATASETS[datasetId]) return res.status(400).json({ error: 'unknown dataset', datasetId });
 
+  // The Buy button must stay public (judges click it), so there is no auth —
+  // but an uncapped public spend is a drain vector. Cap it per IP (20/hour);
+  // the limit is generous for a human and far too slow to drain testnet funds.
+  const rl = await lib.rateLimitBuy(req);
+  if (!rl.allowed) {
+    return res.status(429).json({ error: 'too many buy requests from this address — try again later', rateLimit: { count: rl.count, limit: rl.limit } });
+  }
+
   const steps = [];
-  const base = lib.SITE_URL;
+  const base = lib.baseUrl(req);
   try {
     // 1. Ask for the dataset -> expect 402.
     const first = await fetch(`${base}/api/data/${datasetId}`, {
@@ -63,6 +71,7 @@ module.exports = async (req, res) => {
       dataset: paidBody.dataset,
       payment: paidBody.payment,
       audit: paidBody.audit,
+      auditRecorded: paidBody.auditRecorded,
       steps,
     });
   } catch (e) {

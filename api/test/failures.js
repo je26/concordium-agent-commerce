@@ -24,7 +24,7 @@ async function buildPayment(requirements, signerAddress, signerKey) {
 }
 
 module.exports = async (req, res) => {
-  const base = lib.SITE_URL;
+  const base = lib.baseUrl(req);
   const results = {};
 
   // 1. Wrong amount ------------------------------------------------------------
@@ -73,7 +73,10 @@ module.exports = async (req, res) => {
     const offered = await first.json();
     const reqs = { ...(offered.accepts || [])[0], maxTimeoutSeconds: 6 };
     const payment = await buildPayment(reqs, process.env.CCD_BUYER_ADDRESS, process.env.CCD_BUYER_KEY);
-    await new Promise((r) => setTimeout(r, 3000)); // let the 1s expiry pass
+    // maxTimeoutSeconds 6: the payment expires 6s after the 402 is issued.
+    // The build + this 3s wait + the submit request take longer than 6s in
+    // total, so the facilitator rejects the retry as expired.
+    await new Promise((r) => setTimeout(r, 3000));
     const r = await fetch(`${base}/api/data/ds-belinyu-air`, {
       headers: { 'PAYMENT-SIGNATURE': lib.b64urlEncode(payment), 'X-Buyer-Badge': lib.BUYER_BADGE },
     });

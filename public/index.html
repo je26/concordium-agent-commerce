@@ -25,13 +25,10 @@
   nav .brand img { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; }
   nav a { color: var(--text); padding: 8px 4px; white-space: nowrap; flex-shrink: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
   nav a:hover { color: var(--text); text-decoration: none; }
-  nav a.active { color: var(--accent); font-weight: 600; }
   header { padding: 32px 0 4px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   header img { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
   header h1 { font-size: 44px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
   header .sub { color: var(--text); font-size: 19px; font-weight: 600; margin-top: 10px; line-height: 1.3; }
-  .pill { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--gold); background: rgba(212,175,55,.12); }
-  .pill-row { margin: 10px 0 0; }
   .lede { color: var(--muted); font-size: 18px; max-width: 720px; margin: 18px 0 30px; }
   .lede strong { color: var(--text); font-weight: 600; }
   section { margin-top: 36px; }
@@ -220,6 +217,15 @@ $('#buy-btn').addEventListener('click', async () => {
   result.style.display = 'none';
   steps.style.display = 'block';
   const setSteps = (list) => { steps.innerHTML = list.map(s => `<li class="${s.cls}">${s.text}</li>`).join(''); };
+  // Render the real steps the server reports (it returns its own step trail
+  // in the response). While waiting, show the plan with only the first step
+  // busy — the old 5-second timer advanced the display regardless of actual
+  // server progress, which was cosmetic theatre.
+  const renderServerSteps = (srv) => {
+    if (!Array.isArray(srv) || srv.length === 0) return false;
+    setSteps(srv.map(s => ({ text: s.step + (s.status != null ? ` — ${s.status}` : ''), cls: 'done' })));
+    return true;
+  };
   const seq = [
     'Requesting dataset (expecting 402)',
     'Checking seller badge',
@@ -228,11 +234,6 @@ $('#buy-btn').addEventListener('click', async () => {
     'Seller releases dataset',
   ];
   setSteps(seq.map((t, i) => ({ text: t, cls: i === 0 ? 'busy' : '' })));
-  let done = 0;
-  const tick = setInterval(() => {
-    done = Math.min(done + 1, seq.length - 1);
-    setSteps(seq.map((t, i) => ({ text: t, cls: i < done ? 'done' : (i === done ? 'busy' : '') })));
-  }, 5000);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 90000);
   try {
@@ -244,13 +245,12 @@ $('#buy-btn').addEventListener('click', async () => {
     });
     const j = await r.json();
     clearTimeout(timer);
-    clearInterval(tick);
     if (!r.ok || !j.ok) {
-      setSteps(seq.map(t => ({ text: t, cls: '' })));
+      if (!renderServerSteps(j.steps)) setSteps(seq.map(t => ({ text: t, cls: '' })));
       result.style.display = 'block';
-      result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span><br><span class="tx">${JSON.stringify(j.detail || j.steps || {}, null, 2).slice(0, 600)}</span>`;
+      result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span><br><span class="tx">${JSON.stringify(j.detail || {}, null, 2).slice(0, 600)}</span>`;
     } else {
-      setSteps(seq.map(t => ({ text: t, cls: 'done' })));
+      if (!renderServerSteps(j.steps)) setSteps(seq.map(t => ({ text: t, cls: 'done' })));
       result.style.display = 'block';
       result.innerHTML = `<strong>Trade complete.</strong> 1 CCD paid to the seller.<br>
         Transaction: <span class="tx"><a href="${j.payment.explorerUrl}" target="_blank" rel="noopener">${j.payment.txHash}</a></span><br>
@@ -260,10 +260,9 @@ $('#buy-btn').addEventListener('click', async () => {
     }
   } catch (e) {
     clearTimeout(timer);
-    clearInterval(tick);
     setSteps(seq.map(t => ({ text: t, cls: '' })));
     result.style.display = 'block';
-    result.innerHTML = `<span class="err">Trade failed: ${e.name === 'AbortError' ? 'timed out after 90 seconds — no payment was sent. Try again.' : e.message}</span>`;
+    result.innerHTML = `<span class="err">Trade failed: ${e.name === 'AbortError' ? 'timed out after 90 seconds — check the audit log or the explorer before retrying; the payment may have gone through.' : e.message}</span>`;
   } finally {
     btn.disabled = false;
   }

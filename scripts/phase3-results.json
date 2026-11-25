@@ -1,1 +1,108 @@
-{"accounts":{"buyer":"3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf","facilitator":"3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE","seller":"3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M"},"auditLogEntries":3,"blockers":{"githubRepo":"github.com/je26/concordium-agent-commerce does NOT exist; MCP create_repository returns 403 'Resource not accessible by integration'; gh CLI not logged in. Repo creation must be arranged by the parent agent (browser task or Jeje). Code is ready locally at ~/workspace/concordium-agent-commerce/ with README.md."},"bugsFixedDuringPhase3":["@concordium/web-sdk/nodejs is ESM-only: use dynamic import() inside CJS handlers; credentials must be credentials.createSsl(), never undefined","Client createPaymentPayload returns payload {signedTransaction} with NO top-level sender; sender lives in signedTransaction.header.sender","check-badge account-lookup entries carry validity as badge_valid and status under on_chain.status (no top-level status field)"],"date":"2026-11-25T00:41:00Z","demo":"https://concordium-agent-commerce.vercel.app","failureTests":{"allPass":true,"expired":{"got":"transaction_expired","httpStatus":402},"unknownBadge":{"got":"buyer badge not verified","httpStatus":403},"unregisteredSender":{"got":"buyer badge not verified","httpStatus":403},"wrongAmount":{"got":"amount_mismatch: required 1000000, got 500000","httpStatus":402}},"frontendVerified":{"auditRowsRendered":3,"badgeStatuses":["Verified","Verified"],"method":"Playwright Firefox screenshot of the live site","screenshot":"/tmp/shot/demo-top.png"},"network":"ccd:4221332d34e1694168c2a0c0b3fd0f27","phase":"3 + 3.5 + 4 + 4.3","trades":[{"amountMicroCCD":"1000000","blockHeight":51241702,"datasetId":"ds-belinyu-weather-24h","event":"Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M","explorer":"https://ccdexplorer.io/testnet/transaction/39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec","outcome":"success","txHash":"39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec"},{"amountMicroCCD":"1000000","blockHeight":51241723,"datasetId":"ds-belinyu-tide","event":"Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M","explorer":"https://ccdexplorer.io/testnet/transaction/7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3","outcome":"success","txHash":"7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3"},{"amountMicroCCD":"1000000","blockHeight":51241876,"datasetId":"ds-belinyu-air","event":"Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M","explorer":"https://ccdexplorer.io/testnet/transaction/51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772","outcome":"success","txHash":"51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772"}]}
+{
+  "accounts": {
+    "buyer": "3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf",
+    "facilitator": "3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE",
+    "seller": "3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M"
+  },
+  "auditLogEntries": 6,
+  "blockers": {
+    "githubRepo": "RESOLVED \u2014 repo exists at github.com/je26/concordium-agent-commerce (main, 45 files)."
+  },
+  "bugsFixedDuringPhase3": [
+    "@concordium/web-sdk/nodejs is ESM-only: use dynamic import() inside CJS handlers; credentials must be credentials.createSsl(), never undefined",
+    "Client createPaymentPayload returns payload {signedTransaction} with NO top-level sender; sender lives in signedTransaction.header.sender",
+    "check-badge account-lookup entries carry validity as badge_valid and status under on_chain.status (no top-level status field)"
+  ],
+  "date": "2026-11-25T00:41:00Z",
+  "demo": "https://concordium-agent-commerce.vercel.app",
+  "failureTests": {
+    "allPass": true,
+    "expired": {
+      "got": "transaction_expired",
+      "httpStatus": 402
+    },
+    "unknownBadge": {
+      "got": "buyer badge not verified",
+      "httpStatus": 403
+    },
+    "unregisteredSender": {
+      "got": "buyer badge not verified",
+      "httpStatus": 403
+    },
+    "wrongAmount": {
+      "got": "amount_mismatch: required 1000000, got 500000",
+      "httpStatus": 402
+    }
+  },
+  "frontendVerified": {
+    "auditRowsRendered": 6,
+    "badgeStatuses": [
+      "Verified",
+      "Verified"
+    ],
+    "method": "Playwright Firefox screenshot of the live site",
+    "screenshot": "ephemeral /tmp path \u2014 not retained"
+  },
+  "network": "ccd:4221332d34e1694168c2a0c0b3fd0f27",
+  "phase": "3 + 3.5 + 4 + 4.3",
+  "trades": [
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51241702,
+      "datasetId": "ds-belinyu-weather-24h",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec",
+      "outcome": "success",
+      "txHash": "39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec"
+    },
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51241723,
+      "datasetId": "ds-belinyu-tide",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3",
+      "outcome": "success",
+      "txHash": "7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3"
+    },
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51241876,
+      "datasetId": "ds-belinyu-air",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772",
+      "outcome": "success",
+      "txHash": "51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772"
+    },
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51242054,
+      "datasetId": "ds-belinyu-weather-24h",
+      "datasetTitle": "24h On-Chain Activity (synthetic)",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47",
+      "outcome": "success",
+      "txHash": "b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47"
+    },
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51242654,
+      "datasetId": "ds-onchain-activity-24h",
+      "datasetTitle": "24h On-Chain Activity (synthetic)",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854",
+      "outcome": "success",
+      "txHash": "ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854"
+    },
+    {
+      "amountMicroCCD": "1000000",
+      "blockHeight": 51244479,
+      "datasetId": "ds-onchain-activity-24h",
+      "datasetTitle": "24h On-Chain Activity (synthetic)",
+      "event": "Transferred 1.000000 CCD from 3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf to 3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M",
+      "explorer": "https://ccdexplorer.io/testnet/transaction/60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52",
+      "outcome": "success",
+      "txHash": "60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52"
+    }
+  ],
+  "updatedAt": "2026-11-25T01:55:00Z"
+}

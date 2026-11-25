@@ -5,5 +5,6 @@
   "nonce": "3",
   "txHash": "98e0993c162d3ad01b766c8f18beda9b42c20f4136c55ccacbf780d5d53ff7bd",
   "submittedAt": "2026-11-24T18:08:29.360Z",
-  "explorerUrl": "https://ccdexplorer.io/testnet/transaction/98e0993c162d3ad01b766c8f18beda9b42c20f4136c55ccacbf780d5d53ff7bd"
+  "explorerUrl": "https://ccdexplorer.io/testnet/transaction/98e0993c162d3ad01b766c8f18beda9b42c20f4136c55ccacbf780d5d53ff7bd",
+  "note": "v2 was a hash-only setAgentURI update: parameterHex carries only the 32-byte metadata hash (no URI). The agent URI was preserved by the registry call; the URI+hash form returned in v1 and v3. See scripts/card-update-2026-11-25/manifest.json for the full hash timeline."
 }

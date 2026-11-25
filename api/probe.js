@@ -18,7 +18,6 @@ module.exports = async (req, res) => {
     const { AccountAddress } = await import('@concordium/web-sdk');
     const client = new ConcordiumGRPCNodeClient('grpc.testnet.concordium.com', 20000, credentials.createSsl());
     const nonce = await client.getNextAccountNonce(AccountAddress.fromBase58('3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf'));
-    out.nonce = nonce.nonce.toString();
     const nonce2 = await client.getNextAccountNonce(AccountAddress.fromBase58('3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M'));
     const nonce3 = await client.getNextAccountNonce(AccountAddress.fromBase58('3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE'));
     out.nonces = { buyer: nonce.nonce.toString(), seller: nonce2.nonce.toString(), facilitator: nonce3.nonce.toString() };

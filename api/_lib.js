@@ -23,9 +23,12 @@ function mulberry32(seed) {
 function onchainRows() {
   const rnd = mulberry32(20261124);
   const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  // Real Concordium account addresses are 50 base58 chars; generate the same
+  // shape (leading '3' + 49 chars) so the synthetic rows look structurally
+  // valid. The data is still clearly fake (see the dataset description).
   const addr = () => {
     let s = '3';
-    for (let i = 0; i < 11; i++) s += B58[Math.floor(rnd() * B58.length)];
+    for (let i = 0; i < 49; i++) s += B58[Math.floor(rnd() * B58.length)];
     return s;
   };
   const types = ['transfer', 'contract call', 'token mint'];
@@ -93,17 +96,80 @@ const DATASETS = {
 
 function paymentRequirements(datasetId) {
   const ds = DATASETS[datasetId];
+  const seller = process.env.CCD_SELLER_ADDRESS;
+  const facilitator = process.env.CCD_FACILITATOR_ADDRESS;
+  if (!seller) throw new Error('missing env var: CCD_SELLER_ADDRESS is not set');
+  if (!facilitator) throw new Error('missing env var: CCD_FACILITATOR_ADDRESS is not set');
   return {
     scheme: 'exact',
     network: NETWORK,
     amount: PRICE_MICROCCD,
     asset: 'CCD',
-    payTo: process.env.CCD_SELLER_ADDRESS,
+    payTo: seller,
     maxTimeoutSeconds: 300,
     description: `Dataset: ${ds.title} — 1 CCD`,
     mimeType: 'application/json',
-    extra: { feePayer: process.env.CCD_FACILITATOR_ADDRESS },
+    extra: { feePayer: facilitator },
   };
+}
+
+// --- Facilitator requirements guard (H1) -------------------------------------
+// The public /api/facilitator/settle and /api/facilitator/verify endpoints
+// take caller-supplied `requirements`. This demo's facilitator only ever
+// settles the seller's own 1 CCD payments, so pin the requirements to the
+// server's values and reject anything else. A legitimate x402 client sends
+// exactly the requirements from the 402, so this does not break real flows.
+function validateFacilitatorRequirements(requirements) {
+  if (!requirements || typeof requirements !== 'object') return 'requirements must be an object';
+  if (requirements.scheme !== 'exact') return `scheme must be 'exact', got '${requirements.scheme}'`;
+  if (requirements.network !== NETWORK) return `network must be '${NETWORK}', got '${requirements.network}'`;
+  if (String(requirements.amount) !== PRICE_MICROCCD) return `amount must be '${PRICE_MICROCCD}' (1 CCD), got '${requirements.amount}'`;
+  const seller = process.env.CCD_SELLER_ADDRESS;
+  if (!seller) return 'server misconfigured: CCD_SELLER_ADDRESS is not set';
+  if (requirements.payTo !== seller) return `payTo must be the seller '${seller}', got '${requirements.payTo}'`;
+  return null; // valid
+}
+
+// --- Base URL for self-calls (L8) -------------------------------------------
+// Derive from the incoming request host so `vercel dev` hits the local server
+// instead of production. Falls back to the production SITE_URL.
+function baseUrl(req) {
+  const host = req && req.headers && req.headers.host;
+  if (!host) return SITE_URL;
+  const proto = (req.headers['x-forwarded-proto'] || '').split(',')[0].trim()
+    || (/^(localhost|127\.0\.0\.1)/.test(host) ? 'http' : 'https');
+  return `${proto}://${host}`;
+}
+
+// --- Per-IP rate limit for /api/buy (H2) -------------------------------------
+// The demo Buy button must stay public (judges click it), so the endpoint has
+// no auth — but an uncapped public spend is a drain vector. Cap it per IP via
+// KV: 20 buys per hour. Generous for a human judge, far too slow to drain the
+// testnet wallets (20,000 CCD would need 1,000 IPs or 1,000 hours from one IP).
+// Fails OPEN when KV is unavailable so a KV outage never bricks the demo;
+// the settle-side pinning (H1) still blocks arbitrary payments.
+async function rateLimitBuy(req, limit = 20, windowSeconds = 3600) {
+  const { url, token } = kv();
+  if (!url || !token) return { allowed: true, reason: 'kv not configured (fail open)' };
+  const ip = ((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim()
+    || (req.headers && req.headers['x-real-ip']) || 'unknown';
+  const key = `ccd-ratelimit:buy:${ip}`;
+  try {
+    const r = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!r.ok) return { allowed: true, reason: 'kv incr failed (fail open)' };
+    const j = await r.json();
+    const count = j.result;
+    if (count === 1) {
+      await fetch(`${url}/expire/${encodeURIComponent(key)}/${windowSeconds}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+    return { allowed: count <= limit, count, limit };
+  } catch (e) {
+    return { allowed: true, reason: `kv error (fail open): ${e.message || e}` };
+  }
 }
 
 // --- Badge checks (via the hosted Agent Registry MCP REST API) ---------------
@@ -191,6 +257,9 @@ async function getBuyerScheme() {
 async function getTxBlockHeight(txHash) {
   const { ConcordiumGRPCNodeClient, credentials } = await import('@concordium/web-sdk/nodejs');
   const { TransactionHash } = await import('@concordium/web-sdk');
+  // The SDK exposes no close/shutdown method on the client, and Vercel
+  // functions are short-lived, so the client is intentionally left to be
+  // reclaimed with the function instance.
   const client = new ConcordiumGRPCNodeClient('grpc.testnet.concordium.com', 20000, credentials.createSsl());
   const status = await client.getBlockItemStatus(TransactionHash.fromHexString(txHash));
   const blockHash = status.status === 'finalized'
@@ -212,6 +281,7 @@ function b64urlDecode(str) {
 module.exports = {
   NETWORK, PRICE_MICROCCD, SELLER_BADGE, BUYER_BADGE, SELLER_TOKEN_ID, BUYER_TOKEN_ID,
   MCP_BASE, SITE_URL, DATASETS, paymentRequirements,
+  validateFacilitatorRequirements, baseUrl, rateLimitBuy,
   checkBadgeByAccount, checkBadgeByToken,
   appendAudit, readAudit,
   getFacilitatorScheme, getBuyerScheme,

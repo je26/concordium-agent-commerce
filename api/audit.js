@@ -16,6 +16,13 @@ const TITLE_MAP = {
   'Belinyu Air Quality Readings (synthetic)': 'Air Quality Readings (synthetic)',
 };
 
+// The weather dataset was renamed to on-chain activity, but the two oldest
+// stored trades still carry its original ID. Map the ID at read time (same
+// no-rewrite rule as titles) so every audit entry resolves in the catalog.
+const DATASET_ID_MAP = {
+  'ds-belinyu-weather-24h': 'ds-onchain-activity-24h',
+};
+
 // Block heights for the trades that were recorded before the seller started
 // capturing them at settle time. Each height was read from CCDExplorer
 // (ccdexplorer.io/testnet/transaction/<hash>) on 2026-11-25. Stored entries
@@ -45,6 +52,7 @@ module.exports = async (req, res) => {
     if (!e) return e;
     const out = { ...e };
     if (TITLE_MAP[out.datasetTitle]) out.datasetTitle = TITLE_MAP[out.datasetTitle];
+    if (DATASET_ID_MAP[out.datasetId]) out.datasetId = DATASET_ID_MAP[out.datasetId];
     if (out.blockHeight == null && BLOCK_HEIGHTS[out.txHash] != null) {
       out.blockHeight = BLOCK_HEIGHTS[out.txHash];
     }

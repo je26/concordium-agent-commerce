@@ -8,6 +8,11 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   const { payload, requirements } = req.body || {};
   if (!payload || !requirements) return res.status(400).json({ error: 'payload and requirements required' });
+  // This facilitator only settles the seller's own 1 CCD payments. Pin the
+  // requirements server-side so a caller cannot redirect the payment or the
+  // fee sponsorship to another address or amount.
+  const bad = lib.validateFacilitatorRequirements(requirements);
+  if (bad) return res.status(400).json({ error: 'requirements rejected', detail: bad });
   try {
     const scheme = await lib.getFacilitatorScheme();
     const result = await scheme.settle(payload, requirements);

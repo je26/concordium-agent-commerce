@@ -1,1 +1,21 @@
-{"buyerBadge":"JyP9XicC3TrEGEkFeSqtZ","buyerCardHash":"497efe1d922c89e2d034e2fc07cd88a441e0d74bc07cc2506d03c6f0233884ee","buyerRegisterBlock":51241449,"buyerRegisterTx":"2b508750b8b7e85b6581f6b93df4a9c77e52e5ead7d3285b33b33b9c8977975e","buyerSetUriTx":"c5356882b386fe52874aa652a2b64ca9dd3ef5ee800dc3ac8b0df26d79cf8662","buyerTokenId":1483,"network":"testnet","registryContract":{"index":12802,"subindex":0},"sellerBadge":"JyP9XhWi7SMJS7WQfCw7V","sellerCardHash":"c8123adb884e347307c8ce7832f119baf82ea20fea492e02596daef660a7b3a8","sellerRegisterBlock":51241421,"sellerRegisterTx":"e00b24c9d3965defde8373ae09891d91169a7b986eaf4df07a52ad9f704b896f","sellerSetUriTx":"0551bc7dac220d390c992968b02cae4882943f4316e889171a19bbf14e2cf975","sellerTokenId":1482,"verifiedAt":"2026-11-24T17:35:00Z"}
+{
+  "buyerBadge": "JyP9XicC3TrEGEkFeSqtZ",
+  "buyerCardHash": "497efe1d922c89e2d034e2fc07cd88a441e0d74bc07cc2506d03c6f0233884ee",
+  "buyerRegisterBlock": 51241449,
+  "buyerRegisterTx": "2b508750b8b7e85b6581f6b93df4a9c77e52e5ead7d3285b33b33b9c8977975e",
+  "buyerSetUriTx": "c5356882b386fe52874aa652a2b64ca9dd3ef5ee800dc3ac8b0df26d79cf8662",
+  "buyerTokenId": 1483,
+  "network": "testnet",
+  "registryContract": {
+    "index": 12802,
+    "subindex": 0
+  },
+  "sellerBadge": "JyP9XhWi7SMJS7WQfCw7V",
+  "sellerCardHash": "c8123adb884e347307c8ce7832f119baf82ea20fea492e02596daef660a7b3a8",
+  "sellerRegisterBlock": 51241421,
+  "sellerRegisterTx": "e00b24c9d3965defde8373ae09891d91169a7b986eaf4df07a52ad9f704b896f",
+  "sellerSetUriTx": "0551bc7dac220d390c992968b02cae4882943f4316e889171a19bbf14e2cf975",
+  "sellerTokenId": 1482,
+  "verifiedAt": "2026-11-24T17:35:00Z",
+  "cardHashHistory": "Card hashes changed twice after registration. Registration hashes (metadata_hash_hex in scripts/registration-*.json: buyer 5cf208bca5bd09faf019bbd9145cf416e7026838ee4f600721654403366a96c3, seller 94019612457e1ac72454c5aa548fe357e1ca47f844c6fe55999ef1a255721a81) were replaced by the first setAgentURI (v1: buyer 497efe1d922c89e2d034e2fc07cd88a441e0d74bc07cc2506d03c6f0233884ee tx c5356882b386fe52874aa652a2b64ca9dd3ef5ee800dc3ac8b0df26d79cf8662, seller c8123adb884e347307c8ce7832f119baf82ea20fea492e02596daef660a7b3a8 tx 0551bc7dac220d390c992968b02cae4882943f4316e889171a19bbf14e2cf975). The current on-chain hashes are the v3 values (buyer dbeff9a3131199512776e6f7144e92103c77e91a8307ed7c8baed7b287fa9ded tx f9a4a54bcb9900e2bfcd9788773baf5d5d8cf3b3eabb6d1a90e0be021f1437f0, seller aff3dee1fa154884ab195fb2e149dc0dadb265f7c3a6a6e6f21b4d3afce5cb14 tx 43c290eb39e35dab28d28a383013db3c76303d151917e63902a8091aa95acdc6). The buyerCardHash/sellerCardHash fields in this file are the v1 values."
+}

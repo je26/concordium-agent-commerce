@@ -93,11 +93,18 @@ module.exports = async (req, res) => {
     ccdexplorerUrl: `https://ccdexplorer.io/testnet/transaction/${txHash}`,
     badgeCheckUrl: `https://agent-registry-mcp.concordium.com/v1/check-badge/${badgeChk.badges[0] || sender}?network=testnet`,
   };
-  await lib.appendAudit(entry);
+  // The audit entry is the public proof of the trade. If the append fails
+  // (KV down/misconfigured) the payment has still settled, so the trade
+  // succeeds — but the response must say so honestly instead of silently
+  // leaving the log incomplete.
+  const auditResult = await lib.appendAudit(entry);
+  const auditRecorded = !!(auditResult && auditResult.ok);
+  if (!auditRecorded) console.error('audit append failed', auditResult);
 
   return res.status(200).json({
     dataset: ds,
     payment: { txHash, explorerUrl: entry.ccdexplorerUrl, amountMicroCCD: lib.PRICE_MICROCCD, payer: sender },
     audit: entry,
+    auditRecorded,
   });
 };

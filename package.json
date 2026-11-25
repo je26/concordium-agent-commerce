@@ -2,9 +2,8 @@
   "name": "concordium-agent-commerce",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --check api/_lib.js && node --check api/audit.js && node --check api/buy.js && node --check api/catalog.js && node --check api/badge.js && node --check api/probe.js && node --check \"api/data/[id].js\" && node --check api/facilitator/settle.js && node --check api/facilitator/verify.js && node --check api/facilitator/supported.js && node --check api/test/failures.js"
   },
   "keywords": [],
   "author": "",
