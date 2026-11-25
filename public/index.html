@@ -161,7 +161,7 @@
 
   <section id="audit">
     <h2>Audit log</h2>
-    <p class="hint">One entry per trade, with the transaction and badge check. Append-only: titles and IDs are shown as they were at the time of the trade. The two "24h Weather Readings" entries are the old weather dataset, now retired and replaced by the different "24h On-Chain Activity" dataset; hashes unchanged. <a href="/api/audit">View as JSON</a></p>
+    <p class="hint">One entry per trade, with transaction and badge check. Append-only: titles and IDs as traded. The two “24h Weather Readings” entries are the retired dataset — replaced by a different one, hashes unchanged. <a href="/api/audit">View as JSON</a></p>
     <div id="audit-box"><div class="empty">Loading…</div></div>
   </section>
 
@@ -211,7 +211,7 @@ async function loadAudit() {
       <td data-label="Amount">${e.amountCCD} CCD</td>
       <td data-label="Transaction"><span class="mono"><a href="${e.ccdexplorerUrl}" target="_blank" rel="noopener">${e.txHash.slice(0, 12)}…${e.txHash.slice(-8)}</a></span></td>
       <td data-label="Block">${e.blockHeight != null ? e.blockHeight : '—'}</td>
-      <td data-label="Badge">${e.badgeCheckVerdict}</td>
+      <td data-label="Badge"><span class="${e.badgeCheckVerdict === 'verified' ? 'badge-ok' : 'badge-bad'}">${e.badgeCheckVerdict}</span></td>
     </tr>`).join('');
     box.innerHTML = `<table><thead><tr><th>Time</th><th>Dataset</th><th>Amount</th><th>Transaction</th><th>Block</th><th>Badge</th></tr></thead><tbody>${rows}</tbody></table>`;
   } catch (e) {
