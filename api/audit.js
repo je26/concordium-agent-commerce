@@ -11,10 +11,12 @@
 // or as read from the chain (see BLOCK_HEIGHTS).
 const lib = require('./_lib');
 
-// Nov 2026: the hometown name was removed from all visible titles. This
-// mapping only strips that prefix; it does NOT rename the dataset itself.
-// The weather dataset kept the name "24h Weather Readings" at the time of
-// its trades.
+// The four oldest stored entries still carry the place-name prefix in
+// their stored datasetTitle (append-only log — stored entries are never
+// rewritten). This mapping strips that prefix at serve time only; it does
+// NOT rename the dataset itself. It is load-bearing: removing it puts the
+// prefix back on the visible site. The weather dataset kept the name
+// "24h Weather Readings" at the time of its trades.
 const TITLE_MAP = {
   'Belinyu 24h Weather Readings (synthetic)': '24h Weather Readings (synthetic)',
   'Belinyu Tide Table (synthetic)': 'Tide Table (synthetic)',
