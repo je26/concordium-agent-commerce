@@ -1,32 +1,44 @@
 // GET /api/audit — the public append-only audit log of every trade.
-// Entries: timestamp, buyerBadge, sellerBadge, datasetId, amountMicroCCD,
-// txHash, blockHeight, badgeCheckVerdict, ccdexplorerUrl, badgeCheckUrl.
+// Entries: timestamp, buyerBadge, sellerBadge, datasetId, datasetTitle,
+// displayTitle, amountMicroCCD, txHash, blockHeight, badgeCheckVerdict,
+// ccdexplorerUrl, badgeCheckUrl.
+//
+// APPEND-ONLY RULE (2026-11-25, owner order): stored entries are never
+// rewritten. datasetId and datasetTitle are served as they were at the time
+// of the trade. A newer display name, if any, goes in the separate
+// displayTitle field; it never overwrites datasetTitle. Tx hashes,
+// timestamps, badges, amounts and block heights are served exactly as stored
+// or as read from the chain (see BLOCK_HEIGHTS).
 const lib = require('./_lib');
 
-// Rename (2026-11-25): the project no longer uses the old hometown name in
-// any visible text. Stored entries keep their original datasetTitle (history
-// is not rewritten); only the displayed label is mapped here. Tx hashes,
-// timestamps, badges and amounts are served exactly as stored.
-// The weather dataset was renamed to on-chain activity, so its old titles
-// map to the current dataset title (2026-11-25 fix: uniform titles in log).
+// Nov 2026: the hometown name was removed from all visible titles. This
+// mapping only strips that prefix; it does NOT rename the dataset itself.
+// The weather dataset kept the name "24h Weather Readings" at the time of
+// its trades; it was renamed to "24h On-Chain Activity" only later, and
+// that newer name lives in displayTitle, not here.
 const TITLE_MAP = {
-  'Belinyu 24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
-  '24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
+  'Belinyu 24h Weather Readings (synthetic)': '24h Weather Readings (synthetic)',
   'Belinyu Tide Table (synthetic)': 'Tide Table (synthetic)',
   'Belinyu Air Quality Readings (synthetic)': 'Air Quality Readings (synthetic)',
 };
 
-// The weather dataset was renamed to on-chain activity, but the two oldest
-// stored trades still carry its original ID. Map the ID at read time (same
-// no-rewrite rule as titles) so every audit entry resolves in the catalog.
-const DATASET_ID_MAP = {
-  'ds-belinyu-weather-24h': 'ds-onchain-activity-24h',
+// Current display name for a dataset that was renamed after some trades.
+// Informational only — datasetTitle above stays the name at the time of the
+// trade. The "24h Weather Readings" dataset is now called "24h On-Chain
+// Activity"; same dataset, new name.
+const DISPLAY_TITLE_MAP = {
+  '24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
 };
 
-// Block heights for the trades that were recorded before the seller started
-// capturing them at settle time. Each height was read from CCDExplorer
-// (ccdexplorer.io/testnet/transaction/<hash>) on 2026-11-25. Stored entries
-// keep blockHeight: null; only the served value is filled in here.
+// Block heights for the trades recorded before the seller started capturing
+// them at settle time. Each height was read from the transaction receipt on
+// CCDExplorer (ccdexplorer.io/testnet/transaction/<hash>) on 2026-11-25 —
+// NOT calculated from the timestamp. Re-verified 2026-11-25 against the
+// explorer: tx 39249bd6… = block 51241702, tx 60f58f78… = block 51244479.
+// Concordium testnet has a fixed 2-second block time, so block height tracks
+// time closely — that is a property of the chain, not a calculation in this
+// code. Stored entries keep blockHeight: null; only the served value is
+// filled in here.
 const BLOCK_HEIGHTS = {
   '39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec': 51241702,
   '7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3': 51241723,
@@ -52,7 +64,11 @@ module.exports = async (req, res) => {
     if (!e) return e;
     const out = { ...e };
     if (TITLE_MAP[out.datasetTitle]) out.datasetTitle = TITLE_MAP[out.datasetTitle];
-    if (DATASET_ID_MAP[out.datasetId]) out.datasetId = DATASET_ID_MAP[out.datasetId];
+    // datasetId is served exactly as stored (append-only). The two oldest
+    // trades keep ds-belinyu-weather-24h; that ID no longer exists in the
+    // catalog because the dataset was renamed — displayTitle shows the
+    // current name for those entries.
+    out.displayTitle = DISPLAY_TITLE_MAP[out.datasetTitle] || out.datasetTitle;
     if (out.blockHeight == null && BLOCK_HEIGHTS[out.txHash] != null) {
       out.blockHeight = BLOCK_HEIGHTS[out.txHash];
     }

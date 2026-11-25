@@ -23,12 +23,14 @@ This runs on the Concordium **testnet**. Testnet identities are issued without v
 
 | Dataset | Tx hash | Block | Explorer |
 |---|---|---|---|
-| 24h On-Chain Activity (synthetic) | `39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec` | 51241702 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec) |
+| 24h Weather Readings (synthetic) | `39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec` | 51241702 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/39249bd6cf93de87d63d50296b96412a3f7a0d5ddeec13d9d76078f4819659ec) |
 | Tide Table (synthetic) | `7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3` | 51241723 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/7a491de3652db42cfecb83fa19762cfb7ac455cae1b2bcdff4f4612cd50c68a3) |
 | Air Quality Readings (synthetic) | `51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772` | 51241876 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/51de01b950781c19529f99d8eed4e8d481383494bc0c9c9784e8dab83f77e772) |
-| 24h On-Chain Activity (synthetic) | `b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47` | 51242054 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47) |
+| 24h Weather Readings (synthetic) | `b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47` | 51242054 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/b186154e7214204ab67830a9f4ed06cabed5848fc071e84a1df294ac2d97bc47) |
 | 24h On-Chain Activity (synthetic) | `ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854` | 51242654 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854) |
 | 24h On-Chain Activity (synthetic) | `60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52` | 51244479 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52) |
+
+The "24h Weather Readings" dataset was renamed to "24h On-Chain Activity" in Nov 2026; the two older entries show the name at the time of the trade (append-only log).
 
 Each is a `Transfer` of exactly **1.000000 CCD** from the buyer account `3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf` to the seller account `3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M`, outcome **success**.
 
