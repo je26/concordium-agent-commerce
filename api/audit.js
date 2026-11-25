@@ -7,8 +7,11 @@ const lib = require('./_lib');
 // any visible text. Stored entries keep their original datasetTitle (history
 // is not rewritten); only the displayed label is mapped here. Tx hashes,
 // timestamps, badges and amounts are served exactly as stored.
+// The weather dataset was renamed to on-chain activity, so its old titles
+// map to the current dataset title (2026-11-25 fix: uniform titles in log).
 const TITLE_MAP = {
-  'Belinyu 24h Weather Readings (synthetic)': '24h Weather Readings (synthetic)',
+  'Belinyu 24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
+  '24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
   'Belinyu Tide Table (synthetic)': 'Tide Table (synthetic)',
   'Belinyu Air Quality Readings (synthetic)': 'Air Quality Readings (synthetic)',
 };
