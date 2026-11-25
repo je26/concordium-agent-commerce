@@ -30,7 +30,7 @@ This runs on the Concordium **testnet**. Testnet identities are issued without v
 | 24h On-Chain Activity (synthetic) | `ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854` | 51242654 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/ae8c61874ebafa63f93880adcd24e705534ae5ab689b5429385a41fd17a45854) |
 | 24h On-Chain Activity (synthetic) | `60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52` | 51244479 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52) |
 
-The "24h Weather Readings" dataset was renamed to "24h On-Chain Activity" in Nov 2026; the two older entries show the name at the time of the trade (append-only log).
+The "24h Weather Readings" dataset was retired in Nov 2026 and replaced by a different dataset, "24h On-Chain Activity"; the two older entries show the dataset that was actually bought (append-only log).
 
 Each is a `Transfer` of exactly **1.000000 CCD** from the buyer account `3ofDMxgCe2jRH3jcxJ3ZAzWLJqJck6WoXgUcZqcx8Tj5QU2epf` to the seller account `3TL4w5QnoRFYqyQYPDZ7CxiyqAxRH2Bj2sR69S9t2ehVzpsM9M`, outcome **success**.
 

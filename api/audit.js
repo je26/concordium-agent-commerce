@@ -14,20 +14,19 @@ const lib = require('./_lib');
 // Nov 2026: the hometown name was removed from all visible titles. This
 // mapping only strips that prefix; it does NOT rename the dataset itself.
 // The weather dataset kept the name "24h Weather Readings" at the time of
-// its trades; it was renamed to "24h On-Chain Activity" only later, and
-// that newer name lives in displayTitle, not here.
+// its trades.
 const TITLE_MAP = {
   'Belinyu 24h Weather Readings (synthetic)': '24h Weather Readings (synthetic)',
   'Belinyu Tide Table (synthetic)': 'Tide Table (synthetic)',
   'Belinyu Air Quality Readings (synthetic)': 'Air Quality Readings (synthetic)',
 };
 
-// Current display name for a dataset that was renamed after some trades.
-// Informational only — datasetTitle above stays the name at the time of the
-// trade. The "24h Weather Readings" dataset is now called "24h On-Chain
-// Activity"; same dataset, new name.
+// displayTitle shows what was actually bought. The "24h Weather Readings"
+// dataset is DIFFERENT data from the current "24h On-Chain Activity"
+// dataset — it was retired, not renamed — so its entries must not display
+// as on-chain activity. The "(dataset lama)" tag marks the old dataset.
 const DISPLAY_TITLE_MAP = {
-  '24h Weather Readings (synthetic)': '24h On-Chain Activity (synthetic)',
+  '24h Weather Readings (synthetic)': '24h Weather Readings (dataset lama)',
 };
 
 // Block heights for the trades recorded before the seller started capturing
@@ -65,9 +64,9 @@ module.exports = async (req, res) => {
     const out = { ...e };
     if (TITLE_MAP[out.datasetTitle]) out.datasetTitle = TITLE_MAP[out.datasetTitle];
     // datasetId is served exactly as stored (append-only). The two oldest
-    // trades keep ds-belinyu-weather-24h; that ID no longer exists in the
-    // catalog because the dataset was renamed — displayTitle shows the
-    // current name for those entries.
+    // trades keep ds-belinyu-weather-24h; that dataset was retired and
+    // replaced by a different one (ds-onchain-activity-24h) — displayTitle
+    // shows what was actually bought for those entries.
     out.displayTitle = DISPLAY_TITLE_MAP[out.datasetTitle] || out.datasetTitle;
     if (out.blockHeight == null && BLOCK_HEIGHTS[out.txHash] != null) {
       out.blockHeight = BLOCK_HEIGHTS[out.txHash];

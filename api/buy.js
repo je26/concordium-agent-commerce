@@ -12,12 +12,22 @@ module.exports = async (req, res) => {
   if (!lib.DATASETS[datasetId]) return res.status(400).json({ error: 'unknown dataset', datasetId });
 
   // The Buy button must stay public (judges click it), so there is no auth —
-  // but an uncapped public spend is a drain vector. Cap it per IP (20/hour);
-  // the limit is generous for a human and far too slow to drain testnet funds.
+  // but an uncapped public spend is a drain vector. Cap it per IP (20/hour)
+  // AND site-wide (50/day, KV-backed); both are generous for a human and far
+  // too slow to drain testnet funds.
   const rl = await lib.rateLimitBuy(req);
   if (!rl.allowed) {
     return res.status(429).json({ error: 'too many buy requests from this address — try again later', rateLimit: { count: rl.count, limit: rl.limit } });
   }
+  const rg = await lib.rateLimitBuyGlobal(req);
+  if (!rg.allowed) {
+    return res.status(429).json({ error: 'daily buy limit for this site reached — try again tomorrow', rateLimit: { count: rg.count, limit: rg.limit, day: rg.day } });
+  }
+
+  // Trigger info for the audit log (who/what clicked Buy). Passed to the
+  // seller endpoint so the audit entry records it; the raw IP is never
+  // stored, only its hash.
+  const trigger = lib.triggerInfo(req);
 
   const steps = [];
   const base = lib.baseUrl(req);
@@ -58,6 +68,8 @@ module.exports = async (req, res) => {
       headers: {
         'PAYMENT-SIGNATURE': lib.b64urlEncode(paymentPayload),
         'X-Buyer-Badge': lib.BUYER_BADGE,
+        'X-Trigger-Ip-Hash': trigger.ipHash,
+        'X-Trigger-User-Agent': trigger.userAgent,
       },
     });
     const paidBody = await paid.json().catch(() => ({}));

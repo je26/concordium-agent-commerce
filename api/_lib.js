@@ -77,7 +77,7 @@ const DATASETS = {
   'ds-onchain-activity-24h': {
     id: 'ds-onchain-activity-24h',
     title: '24h On-Chain Activity (synthetic)',
-    description: 'Synthetic Concordium testnet transaction records — sender, receiver, amount and type. Clearly fake demo data.',
+    description: '24 synthetic records shaped like testnet transactions — fake sender, receiver, amount and type from a seeded random generator. Not real chain data.',
     rows: onchainRows(),
   },
   'ds-belinyu-tide': {
@@ -141,6 +141,19 @@ function baseUrl(req) {
   return `${proto}://${host}`;
 }
 
+// --- Trigger info for the audit log ----------------------------------------
+// Records WHO/WHAT triggered a buy without storing a raw IP: the client IP
+// is SHA-256 hashed (first 16 hex chars) and the user agent is stored as a
+// (truncated) string. Never store the raw IP in the audit log.
+const crypto = require('crypto');
+function triggerInfo(req) {
+  const ip = ((req.headers && req.headers['x-forwarded-for']) || '').split(',')[0].trim()
+    || (req.headers && req.headers['x-real-ip']) || 'unknown';
+  const ipHash = crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
+  const ua = (req.headers && req.headers['user-agent']) || 'unknown';
+  return { ipHash, userAgent: String(ua).slice(0, 200) };
+}
+
 // --- Per-IP rate limit for /api/buy (H2) -------------------------------------
 // The demo Buy button must stay public (judges click it), so the endpoint has
 // no auth — but an uncapped public spend is a drain vector. Cap it per IP via
@@ -167,6 +180,36 @@ async function rateLimitBuy(req, limit = 20, windowSeconds = 3600) {
       });
     }
     return { allowed: count <= limit, count, limit };
+  } catch (e) {
+    return { allowed: true, reason: `kv error (fail open): ${e.message || e}` };
+  }
+}
+
+// --- Global daily limit for /api/buy ----------------------------------------
+// A per-IP cap alone is weak (an attacker can rotate IPs). Cap the whole site
+// too: 50 buys per day across all callers, counted in KV (Upstash) — never in
+// function memory, which resets on every serverless invocation. The key is
+// per UTC day and expires after 48h. At 1 CCD + ~5 CCD facilitator fee per
+// buy, 50/day bounds the worst case to 50 CCD buyer + ~250 CCD facilitator
+// per day. Fails OPEN when KV is unavailable (same reasoning as per-IP).
+async function rateLimitBuyGlobal(req, limit = 50) {
+  const { url, token } = kv();
+  if (!url || !token) return { allowed: true, reason: 'kv not configured (fail open)' };
+  const day = new Date().toISOString().slice(0, 10); // UTC YYYY-MM-DD
+  const key = `ccd-ratelimit:buy:global:${day}`;
+  try {
+    const r = await fetch(`${url}/incr/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!r.ok) return { allowed: true, reason: 'kv incr failed (fail open)' };
+    const j = await r.json();
+    const count = j.result;
+    if (count === 1) {
+      await fetch(`${url}/expire/${encodeURIComponent(key)}/${48 * 3600}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+    return { allowed: count <= limit, count, limit, day };
   } catch (e) {
     return { allowed: true, reason: `kv error (fail open): ${e.message || e}` };
   }
@@ -281,7 +324,8 @@ function b64urlDecode(str) {
 module.exports = {
   NETWORK, PRICE_MICROCCD, SELLER_BADGE, BUYER_BADGE, SELLER_TOKEN_ID, BUYER_TOKEN_ID,
   MCP_BASE, SITE_URL, DATASETS, paymentRequirements,
-  validateFacilitatorRequirements, baseUrl, rateLimitBuy,
+  validateFacilitatorRequirements, baseUrl, rateLimitBuy, rateLimitBuyGlobal,
+  triggerInfo,
   checkBadgeByAccount, checkBadgeByToken,
   appendAudit, readAudit,
   getFacilitatorScheme, getBuyerScheme,

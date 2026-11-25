@@ -77,6 +77,15 @@ module.exports = async (req, res) => {
     } catch (e) { /* node unreachable — retry below */ }
     if (blockHeight == null && attempt < 2) await new Promise((r) => setTimeout(r, 2000));
   }
+  // Trigger record: who/what initiated this buy. The Buy button path
+  // (/api/buy) forwards the original caller's IP hash + user agent; a direct
+  // x402 call to this endpoint has no forwarded headers, so the trigger is
+  // computed from this request itself. The raw IP is never stored.
+  const fwdIpHash = req.headers['x-trigger-ip-hash'];
+  const fwdUa = req.headers['x-trigger-user-agent'];
+  const trigger = (fwdIpHash || fwdUa)
+    ? { ipHash: fwdIpHash || null, userAgent: fwdUa || null }
+    : lib.triggerInfo(req);
   const entry = {
     timestamp: new Date().toISOString(),
     buyerBadge: badgeChk.badges[0] || null,
@@ -89,6 +98,8 @@ module.exports = async (req, res) => {
     amountCCD: '1',
     txHash,
     blockHeight,
+    triggerIpHash: trigger.ipHash,
+    triggerUserAgent: trigger.userAgent,
     badgeCheckVerdict: 'verified',
     ccdexplorerUrl: `https://ccdexplorer.io/testnet/transaction/${txHash}`,
     badgeCheckUrl: `https://agent-registry-mcp.concordium.com/v1/check-badge/${badgeChk.badges[0] || sender}?network=testnet`,
