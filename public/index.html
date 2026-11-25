@@ -92,6 +92,7 @@
   footer .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
   .copy-btn { background: transparent; border: 1px solid var(--line); color: var(--accent); font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
   .copy-btn:hover { border-color: var(--accent); }
+  .footer-brand { color: var(--text); }
   /* Buy popup: process steps + success / error, over a dimmed backdrop. */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
   .modal-overlay.open { display: flex; }
@@ -103,8 +104,6 @@
   .modal-sub { color: var(--muted); font-size: 13.5px; margin-top: 6px; }
   .modal-foot { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; display: none; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .modal-foot button { padding: 12px 24px; font-size: 15px; }
-  .modal-brand { margin-top: 14px; text-align: center; color: var(--muted); font-size: 12.5px; }
-  .modal-brand a { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -181,7 +180,7 @@
     <p>Testnet identities are unverified, so these badges prove the machinery works — not a real-world identity check. All datasets are synthetic.</p>
     <p>Network: testnet <span class="mono">ccd:4221332d…b3fd0f27</span> · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt;</p>
     <p>Facilitator: <span class="mono">3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE</span> <button class="copy-btn" id="copy-fac" type="button">Copy</button></p>
-    <p><a href="https://sanjayapurba.com" target="_blank" rel="noopener">sanjayapurba</a></p>
+    <p class="footer-brand">sanjayapurba</p>
   </footer>
 </div>
 
@@ -199,7 +198,6 @@
       <a href="#audit" id="buy-modal-audit">View in audit log</a>
       <button id="buy-modal-done" type="button">Done</button>
     </div>
-    <p class="modal-brand"><a href="https://sanjayapurba.com" target="_blank" rel="noopener">sanjayapurba</a></p>
   </div>
 </div>
 
