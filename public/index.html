@@ -92,6 +92,19 @@
   footer .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
   .copy-btn { background: transparent; border: 1px solid var(--line); color: var(--accent); font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
   .copy-btn:hover { border-color: var(--accent); }
+  /* Buy popup: process steps + success / error, over a dimmed backdrop. */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto; padding: 22px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .modal-head h3 { font-size: 19px; }
+  .modal-close { background: transparent; border: 1px solid var(--line); color: var(--text); font-size: 20px; font-weight: 700; width: 36px; height: 36px; min-height: 36px; padding: 0; border-radius: 50%; cursor: pointer; line-height: 1; flex-shrink: 0; }
+  .modal-close:hover { border-color: var(--accent); background: transparent; }
+  .modal-sub { color: var(--muted); font-size: 13.5px; margin-top: 6px; }
+  .modal-foot { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 16px; display: none; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .modal-foot button { padding: 12px 24px; font-size: 15px; }
+  .modal-brand { margin-top: 14px; text-align: center; color: var(--muted); font-size: 12.5px; }
+  .modal-brand a { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -154,8 +167,6 @@
         </select>
         <button id="buy-btn">Buy dataset — 1 CCD</button>
       </div>
-      <ul class="steps" id="steps"></ul>
-      <div class="result" id="result"></div>
     </div>
   </section>
 
@@ -170,7 +181,26 @@
     <p>Testnet identities are unverified, so these badges prove the machinery works — not a real-world identity check. All datasets are synthetic.</p>
     <p>Network: testnet <span class="mono">ccd:4221332d…b3fd0f27</span> · Registry: CIS-8004 &lt;12802,0&gt; · CIS-8 &lt;12801,0&gt;</p>
     <p>Facilitator: <span class="mono">3wsSF2qEN3TjfPHeGwLDE5LGXCkrgg4kibMGuaVYJWEDy5jCxE</span> <button class="copy-btn" id="copy-fac" type="button">Copy</button></p>
+    <p><a href="https://sanjayapurba.com" target="_blank" rel="noopener">sanjayapurba</a></p>
   </footer>
+</div>
+
+<!-- Buy popup: process steps + success / error. -->
+<div class="modal-overlay" id="buy-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="buy-modal-title">
+    <div class="modal-head">
+      <h3 id="buy-modal-title">Buy dataset</h3>
+      <button class="modal-close" id="buy-modal-close" type="button" aria-label="Close">×</button>
+    </div>
+    <p class="modal-sub" id="buy-modal-sub"></p>
+    <ul class="steps" id="steps"></ul>
+    <div class="result" id="result"></div>
+    <div class="modal-foot" id="buy-modal-foot">
+      <a href="#audit" id="buy-modal-audit">View in audit log</a>
+      <button id="buy-modal-done" type="button">Done</button>
+    </div>
+    <p class="modal-brand"><a href="https://sanjayapurba.com" target="_blank" rel="noopener">sanjayapurba</a></p>
+  </div>
 </div>
 
 <script>
@@ -219,9 +249,21 @@ async function loadAudit() {
   }
 }
 
+const buyModal = $('#buy-modal'), buyModalSub = $('#buy-modal-sub'), buyModalFoot = $('#buy-modal-foot');
+function openBuyModal() { buyModal.classList.add('open'); buyModal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+function closeBuyModal() { buyModal.classList.remove('open'); buyModal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+$('#buy-modal-close').addEventListener('click', closeBuyModal);
+$('#buy-modal-done').addEventListener('click', closeBuyModal);
+buyModal.addEventListener('click', (e) => { if (e.target === buyModal) closeBuyModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && buyModal.classList.contains('open')) closeBuyModal(); });
+$('#buy-modal-audit').addEventListener('click', closeBuyModal);
+
 $('#buy-btn').addEventListener('click', async () => {
   const btn = $('#buy-btn'), steps = $('#steps'), result = $('#result');
   btn.disabled = true;
+  buyModalSub.textContent = $('#dataset').selectedOptions[0].textContent.replace(' — 1 CCD', '') + ' — 1 CCD, facilitator covers the fee.';
+  buyModalFoot.style.display = 'none';
+  openBuyModal();
   result.style.display = 'none';
   steps.style.display = 'block';
   const setSteps = (list) => { steps.innerHTML = list.map(s => `<li class="${s.cls}">${s.text}</li>`).join(''); };
@@ -258,6 +300,7 @@ $('#buy-btn').addEventListener('click', async () => {
       result.style.display = 'block';
       const auditLink = j.auditLogUrl ? `<br><a href="${j.auditLogUrl}">See today's trades in the public audit log</a>` : '';
       result.innerHTML = `<span class="err">Trade failed: ${j.error || 'unknown error'}</span>${auditLink}<br><span class="tx">${JSON.stringify(j.detail || {}, null, 2).slice(0, 600)}</span>`;
+      buyModalFoot.style.display = 'flex';
     } else {
       if (!renderServerSteps(j.steps)) setSteps(seq.map(t => ({ text: t, cls: 'done' })));
       result.style.display = 'block';
@@ -265,6 +308,7 @@ $('#buy-btn').addEventListener('click', async () => {
         Transaction: <span class="tx"><a href="${j.payment.explorerUrl}" target="_blank" rel="noopener">${j.payment.txHash}</a></span><br>
         Buyer badge: ${j.audit.buyerBadge} · Seller badge: ${j.audit.sellerBadge}<br>
         <div class="data-preview">${JSON.stringify(j.dataset, null, 2).slice(0, 2000)}</div>`;
+      buyModalFoot.style.display = 'flex';
       loadAudit();
     }
   } catch (e) {
@@ -272,6 +316,7 @@ $('#buy-btn').addEventListener('click', async () => {
     setSteps(seq.map(t => ({ text: t, cls: '' })));
     result.style.display = 'block';
     result.innerHTML = `<span class="err">Trade failed: ${e.name === 'AbortError' ? 'timed out after 90 seconds — check the audit log or the explorer before retrying; the payment may have gone through.' : e.message}</span>`;
+    buyModalFoot.style.display = 'flex';
   } finally {
     btn.disabled = false;
   }
