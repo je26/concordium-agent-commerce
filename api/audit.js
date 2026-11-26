@@ -26,9 +26,9 @@ const TITLE_MAP = {
 // displayTitle shows what was actually bought. The "24h Weather Readings"
 // dataset is DIFFERENT data from the current "24h On-Chain Activity"
 // dataset — it was retired, not renamed — so its entries must not display
-// as on-chain activity. The "(dataset lama)" tag marks the old dataset.
+// as on-chain activity. The "(retired dataset)" tag marks the old dataset.
 const DISPLAY_TITLE_MAP = {
-  '24h Weather Readings (synthetic)': '24h Weather Readings (dataset lama)',
+  '24h Weather Readings (synthetic)': '24h Weather Readings (retired dataset)',
 };
 
 // Block heights for the trades recorded before the seller started capturing

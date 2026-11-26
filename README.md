@@ -55,7 +55,7 @@ The dataset IDs `ds-belinyu-tide` and `ds-belinyu-air` keep their original IDs. 
 
 ### The retired weather dataset
 
-The "24h Weather Readings" dataset (`ds-belinyu-weather-24h`) was retired in Nov 2026 and replaced by a different dataset, `ds-onchain-activity-24h`. It was retired, not renamed: the data is different, and the two older trades bought weather data, not on-chain data. Those two entries stay in the audit log with the old dataset ID because the log is append-only and must not be rewritten. The log shows what was actually bought at the time of each trade. The display title for those entries reads "24h Weather Readings (dataset lama)".
+The "24h Weather Readings" dataset (`ds-belinyu-weather-24h`) was retired in Nov 2026 and replaced by a different dataset, `ds-onchain-activity-24h`. It was retired, not renamed: the data is different, and the two older trades bought weather data, not on-chain data. Those two entries stay in the audit log with the old dataset ID because the log is append-only and must not be rewritten. The log shows what was actually bought at the time of each trade. The display title for those entries reads "24h Weather Readings (retired dataset)".
 
 ## Verified trades (testnet)
 
