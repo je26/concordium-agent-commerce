@@ -69,6 +69,7 @@ The "24h Weather Readings" dataset (`ds-belinyu-weather-24h`) was retired in Nov
 | 24h On-Chain Activity (synthetic) | `60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52` | 51244479 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/60f58f7888a4005f6d669d7e3781eaa38387d7159636fa07a451fb845bd1ee52) |
 | 24h On-Chain Activity (synthetic) | `b041d701607258934b1c23097cbebdb34fac3666ed1b7b7447706a5d7fd4fd1e` | 51258849 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/b041d701607258934b1c23097cbebdb34fac3666ed1b7b7447706a5d7fd4fd1e) |
 | 24h On-Chain Activity (synthetic) | `17b2306edc323f21552aae76bbe9a6e4137b166a11b37485f3f83028e35ffbd4` | 51259907 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/17b2306edc323f21552aae76bbe9a6e4137b166a11b37485f3f83028e35ffbd4) |
+| 24h On-Chain Activity (synthetic) | `cc6e5d61cc52c106837f57a4973a1985a291efdb3b68b4f363846e92b6e7af5a` | 51260939 | [ccdexplorer.io](https://ccdexplorer.io/testnet/transaction/cc6e5d61cc52c106837f57a4973a1985a291efdb3b68b4f363846e92b6e7af5a) |
 
 Each is a `transfer` of exactly 1.000000 CCD from the buyer account to the seller account, outcome `success`.
 
@@ -83,7 +84,7 @@ Each is a `transfer` of exactly 1.000000 CCD from the buyer account to the selle
 
 Current hashes (recomputed from the served files on 2026-11-25):
 
-- Buyer card: `dbeff9a3131199512776e6f7144e92103c77e91a8307ed7c9baed7b287fa9ded`
+- Buyer card: `dbeff9a3131199512776e6f7144e92103c77e91a8307ed7c8baed7b287fa9ded`
 - Seller card: `aff3dee1fa154884ab195fb2e149dc0dadb265f7c3a6a6e6f21b4d3afce5cb14`
 
 The card JSON files are never edited after their hash is pinned. Any change to a card changes its hash and breaks the on-chain match.
